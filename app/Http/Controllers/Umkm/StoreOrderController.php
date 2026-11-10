@@ -15,7 +15,7 @@ use Illuminate\View\View;
 class StoreOrderController extends Controller
 {
     /**
-     * List only the store-specific orders belonging to the authenticated UMKM owner.
+     * List only the store-specific orders belonging to the authenticated Penjual owner.
      */
     public function index(Request $request): View
     {

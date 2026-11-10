@@ -4,17 +4,18 @@ namespace App\Policies;
 
 use App\Models\UmkmDisbursement;
 use App\Models\User;
+use App\Support\UserRoles;
 
 class UmkmDisbursementPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->role === 'pemilik_umkm' && $user->umkmStore()->exists();
+        return UserRoles::isSeller($user->role) && $user->umkmStore()->exists();
     }
 
     public function view(User $user, UmkmDisbursement $disbursement): bool
     {
-        return $user->role === 'pemilik_umkm'
+        return UserRoles::isSeller($user->role)
             && $disbursement->umkmStore->user_id === $user->id;
     }
 

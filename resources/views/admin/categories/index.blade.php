@@ -4,7 +4,7 @@
             <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-600">Operasional</p>
                 <h2 class="mt-1 text-2xl font-bold text-slate-950">Manajemen Kategori Produk</h2>
-                <p class="mt-2 max-w-2xl text-sm text-slate-600">Kelola kategori yang tersedia untuk produk milik UMKM.</p>
+                <p class="mt-2 max-w-2xl text-sm text-slate-600">Kelola kategori yang tersedia untuk produk milik Penjual.</p>
             </div>
             <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">
                 Tambah Kategori
@@ -59,7 +59,7 @@
                             <tr>
                                 <td colspan="5" class="px-6 py-14 text-center">
                                     <p class="text-base font-semibold text-slate-800">Belum ada kategori produk</p>
-                                    <p class="mt-2 text-sm text-slate-500">Tambahkan kategori agar Pemilik UMKM dapat memilihnya saat membuat produk.</p>
+                                    <p class="mt-2 text-sm text-slate-500">Tambahkan kategori agar Penjual dapat memilihnya saat membuat produk.</p>
                                 </td>
                             </tr>
                         @endforelse

@@ -2,7 +2,7 @@
         <div class="mb-6 flex items-center justify-between gap-4">
             <div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">Katalog toko</p><h2 class="mt-1 text-2xl font-bold text-slate-900">Produk Toko Saya</h2></div>
             @if ($store->status === 'approved')
-                <a href="{{ route('umkm.products.create') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">
+                <a href="{{ route('umkm.products.create') }}" class="inline-flex items-center rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800">
                     Tambah Produk
                 </a>
             @endif
@@ -25,10 +25,10 @@
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="p-6 overflow-x-auto">
                     @if ($products->isEmpty())
-                        <p class="text-gray-600">Belum ada produk.</p>
+                        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-600">Belum ada produk di toko Anda.</div>
                     @else
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="text-left text-gray-600">
+                            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                                 <tr>
                                     <th class="px-3 py-2">Produk</th>
                                     <th class="px-3 py-2">SKU</th>

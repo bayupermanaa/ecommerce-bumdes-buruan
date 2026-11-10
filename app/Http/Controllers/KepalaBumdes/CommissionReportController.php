@@ -65,11 +65,11 @@ class CommissionReportController extends Controller
             fputcsv($output, [
                 'Tanggal Pembayaran',
                 'Nomor Pesanan',
-                'Nama UMKM',
+                'Nama Penjual',
                 'Total Transaksi Toko',
                 'Persentase Komisi Snapshot',
                 'Komisi BUMDes',
-                'Estimasi Hak UMKM',
+                'Estimasi Hak Penjual',
                 'Status Pembayaran',
                 'Status Pesanan',
             ]);

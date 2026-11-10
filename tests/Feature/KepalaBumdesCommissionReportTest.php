@@ -32,7 +32,7 @@ class KepalaBumdesCommissionReportTest extends TestCase
         $this->get(route('kepala-bumdes.commission-report.index'))->assertRedirect(route('login'));
         $this->get(route('kepala-bumdes.commission-report.export'))->assertRedirect(route('login'));
 
-        foreach (['pelanggan', 'pemilik_umkm', 'admin_bumdes', 'kurir'] as $role) {
+        foreach (['pelanggan', 'penjual', 'admin_bumdes', 'kurir'] as $role) {
             $this->actingAs(User::factory()->create(['role' => $role]))
                 ->get(route('kepala-bumdes.commission-report.index'))
                 ->assertForbidden();
@@ -98,8 +98,8 @@ class KepalaBumdesCommissionReportTest extends TestCase
             ->assertHeader('content-type', 'text/csv; charset=UTF-8');
         $this->assertStringContainsString('laporan-komisi-', (string) $response->headers->get('content-disposition'));
         $this->assertSame([
-            'Tanggal Pembayaran', 'Nomor Pesanan', 'Nama UMKM', 'Total Transaksi Toko',
-            'Persentase Komisi Snapshot', 'Komisi BUMDes', 'Estimasi Hak UMKM',
+            'Tanggal Pembayaran', 'Nomor Pesanan', 'Nama Penjual', 'Total Transaksi Toko',
+            'Persentase Komisi Snapshot', 'Komisi BUMDes', 'Estimasi Hak Penjual',
             'Status Pembayaran', 'Status Pesanan',
         ], $rows[0]);
         $this->assertCount(3, $rows);
@@ -432,7 +432,7 @@ class KepalaBumdesCommissionReportTest extends TestCase
 
     private function makeStore(string $name): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         return $owner->umkmStore()->create([
             'name' => $name,

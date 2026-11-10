@@ -41,10 +41,10 @@ class KepalaBumdesMonitoringTest extends TestCase
         $response
             ->assertOk()
             ->assertSee([
-                'UMKM Terdaftar', '3', 'UMKM Disetujui', '2', 'Produk Disetujui', '1',
+                'Penjual Terdaftar', '3', 'Penjual Disetujui', '2', 'Produk Disetujui', '1',
                 'Seluruh Pesanan', '3', 'Pesanan Dalam Proses', '1', 'Pesanan Selesai', '1',
                 'Pesanan Dibatalkan', '1', 'Rp150.000', 'Rp10.000',
-                'Monitoring Hak UMKM', 'Monitoring Pencairan UMKM', 'Nominal Belum Diketahui', 'Rp0',
+                'Monitoring Hak Penjual', 'Monitoring Pencairan Penjual', 'Nominal Belum Diketahui', 'Rp0',
             ]);
 
         $this->assertArrayHasKey('confirmed_payment_total', $response->viewData('metrics'));
@@ -59,7 +59,7 @@ class KepalaBumdesMonitoringTest extends TestCase
 
     public function test_only_kepala_bumdes_can_access_monitoring_pages(): void
     {
-        foreach (['pelanggan', 'pemilik_umkm', 'admin_bumdes', 'kurir'] as $role) {
+        foreach (['pelanggan', 'penjual', 'admin_bumdes', 'kurir'] as $role) {
             $user = User::factory()->create(['role' => $role]);
 
             $this->actingAs($user)->get(route('kepala-bumdes.dashboard'))->assertForbidden();
@@ -202,7 +202,7 @@ class KepalaBumdesMonitoringTest extends TestCase
 
     private function store(string $name, string $status): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         return $owner->umkmStore()->create([
             'name' => $name,

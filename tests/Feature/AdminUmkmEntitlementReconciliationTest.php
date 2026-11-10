@@ -24,7 +24,7 @@ class AdminUmkmEntitlementReconciliationTest extends TestCase
 
         $this->actingAs($admin)->get(route('admin.umkm-entitlements.index', ['store' => 'Rekonsiliasi', 'status' => 'eligible']))
             ->assertOk()->assertSee([$eligible->order->order_number, 'Toko Rekonsiliasi'])->assertDontSee('Toko Ditahan');
-        $this->actingAs($admin)->get(route('admin.umkm-entitlements.show', $eligible))->assertOk()->assertSee(['Riwayat Event', 'Rekonsiliasi Hak UMKM']);
+        $this->actingAs($admin)->get(route('admin.umkm-entitlements.show', $eligible))->assertOk()->assertSee(['Riwayat Event', 'Rekonsiliasi Hak Penjual']);
         $this->actingAs($admin)->patch(route('admin.umkm-entitlements.reconcile', $eligible), ['notes' => 'Sesuai catatan.'])
             ->assertRedirect(route('admin.umkm-entitlements.show', $eligible));
 
@@ -50,7 +50,7 @@ class AdminUmkmEntitlementReconciliationTest extends TestCase
 
     private function entitlement(string $status, string $name = 'Toko Test'): UmkmEntitlement
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']); $customer = User::factory()->create(['role' => 'pelanggan']);
+        $owner = User::factory()->create(['role' => 'penjual']); $customer = User::factory()->create(['role' => 'pelanggan']);
         $store = $owner->umkmStore()->create(['name' => $name, 'slug' => Str::slug($name).'-'.Str::lower(Str::random(6)), 'status' => 'approved']);
         $order = Order::create(['order_number' => 'ORD-'.Str::upper(Str::random(10)), 'checkout_token' => (string) Str::uuid(), 'user_id' => $customer->id, 'fulfillment_method' => 'pickup', 'recipient_name' => 'Pelanggan', 'recipient_phone' => '081', 'subtotal' => '100.00', 'shipping_total' => '0.00', 'grand_total' => '100.00', 'payment_status' => 'paid', 'order_status' => 'completed']);
         $payment = Payment::create(['order_id' => $order->id, 'confirmed_order_id' => $order->id, 'payment_number' => 'PAY-'.Str::upper(Str::random(10)), 'payment_method' => 'cash_pickup', 'amount' => '100.00', 'status' => 'paid', 'cash_received_by_name' => 'Petugas', 'cash_received_at' => now(), 'confirmed_at' => now()]);

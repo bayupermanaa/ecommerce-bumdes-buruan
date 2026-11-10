@@ -74,7 +74,7 @@ class AdminPaymentVerificationTest extends TestCase
 
         $this->get(route('admin.payments.index'))->assertRedirect(route('login'));
 
-        foreach (['pelanggan', 'pemilik_umkm', 'kurir', 'kepala_bumdes'] as $role) {
+        foreach (['pelanggan', 'penjual', 'kurir', 'kepala_bumdes'] as $role) {
             $user = User::factory()->create(['role' => $role]);
             $this->actingAs($user)->get(route('admin.payments.index'))->assertForbidden();
             $this->actingAs($user)->get(route('admin.payments.proof', $payment))->assertForbidden();
@@ -229,7 +229,7 @@ class AdminPaymentVerificationTest extends TestCase
 
     private function storeOrder(Order $order): StoreOrder
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Snapshot', 'slug' => fake()->unique()->slug()]);
 
         return StoreOrder::create([

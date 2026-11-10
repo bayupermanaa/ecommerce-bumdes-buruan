@@ -30,15 +30,15 @@
     $exportFilters = array_filter($filters, static fn ($value): bool => $value !== null && $value !== '');
 @endphp
 
-<x-kepala-bumdes-layout title="Laporan Hak Pendapatan UMKM">
+<x-kepala-bumdes-layout title="Laporan Hak Pendapatan Penjual">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl">Laporan Hak Pendapatan UMKM</h2>
+        <h2 class="font-semibold text-xl">Laporan Hak Pendapatan Penjual</h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto space-y-6 sm:px-6 lg:px-8">
             <div class="space-y-1 text-sm text-slate-600">
-                <p>Laporan ini menampilkan hak pendapatan UMKM yang terbentuk pada periode terpilih, dikelompokkan berdasarkan status saat laporan dibuka.</p>
+                <p>Laporan ini menampilkan hak pendapatan Penjual yang terbentuk pada periode terpilih, dikelompokkan berdasarkan status saat laporan dibuka.</p>
                 <p>Filter tanggal menggunakan tanggal terbentuknya hak pendapatan (<code>accrued_at</code>). Status yang ditampilkan merupakan status saat ini, bukan posisi saldo historis pada tanggal tersebut.</p>
             </div>
 
@@ -46,7 +46,7 @@
                 <x-text-input type="date" name="date_from" :value="$filters['date_from']" />
                 <x-text-input type="date" name="date_to" :value="$filters['date_to']" />
                 <select name="store_id" class="rounded border-slate-300">
-                    <option value="">Semua UMKM</option>
+                    <option value="">Semua Penjual</option>
                     @foreach ($storeOptions as $store)
                         <option value="{{ $store->id }}" @selected($filters['store_id'] == $store->id)>{{ $store->name }}</option>
                     @endforeach
@@ -87,9 +87,9 @@
             </div>
 
             <div class="overflow-x-auto rounded bg-white p-4 shadow">
-                <h3 class="font-semibold">Rekap per UMKM</h3>
+                <h3 class="font-semibold">Rekap per Penjual</h3>
                 <table class="min-w-full text-sm">
-                    <thead><tr><th>UMKM</th><th>Status</th><th>Jumlah entitlement</th><th>Total nominal diketahui</th><th>Nominal belum diketahui</th></tr></thead>
+                    <thead><tr><th>Penjual</th><th>Status</th><th>Jumlah entitlement</th><th>Total nominal diketahui</th><th>Nominal belum diketahui</th></tr></thead>
                     <tbody>
                         @forelse ($byStore as $row)
                             <tr><td>{{ $row->store_name }}</td><td>{{ $statusLabels[$row->status] ?? $row->status }}</td><td>{{ $row->entitlement_count }}</td><td>{{ $formatRupiah($row->known_amount_total) }}</td><td>{{ $row->unknown_amount_count }}</td></tr>
@@ -103,7 +103,7 @@
             <div class="overflow-x-auto rounded bg-white p-4 shadow">
                 <h3 class="font-semibold">Detail entitlement</h3>
                 <table class="min-w-full text-sm">
-                    <thead><tr><th>Tanggal terbentuk</th><th>UMKM</th><th>Referensi StoreOrder</th><th>Status</th><th>Nominal snapshot</th><th>Eligible</th><th>Reconciled</th><th>Settled</th></tr></thead>
+                    <thead><tr><th>Tanggal terbentuk</th><th>Penjual</th><th>Referensi StoreOrder</th><th>Status</th><th>Nominal snapshot</th><th>Eligible</th><th>Reconciled</th><th>Settled</th></tr></thead>
                     <tbody>
                         @forelse ($details as $entitlement)
                             <tr>

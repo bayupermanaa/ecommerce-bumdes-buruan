@@ -2,7 +2,7 @@
 
     <div class="mx-auto max-w-5xl space-y-6">
             <div class="bg-white p-6 shadow-sm sm:rounded-lg">
-                <p class="text-sm text-gray-500">Toko UMKM</p>
+                <p class="text-sm text-gray-500">Toko Penjual</p>
                 <h3 class="mt-1 text-xl font-semibold text-gray-900">{{ $store->name }}</h3>
                 @if ($currentAgreement)
                     <div class="mt-5 rounded-md bg-green-50 p-4 text-sm text-green-900"><p class="font-semibold">Perjanjian yang berlaku: {{ $currentAgreement->commission_percentage }}%</p><p class="mt-1">Berlaku {{ $currentAgreement->effective_start_date->format('d-m-Y') }} sampai {{ $currentAgreement->effective_end_date?->format('d-m-Y') ?? 'tanpa tanggal akhir' }}.</p></div>

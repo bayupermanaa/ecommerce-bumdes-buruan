@@ -15,9 +15,9 @@ class RoleTestUserSeeder extends Seeder
     {
         $users = [
             [
-                'name' => 'Pemilik UMKM Test',
+                'name' => 'Penjual Test',
                 'email' => 'umkm@test.com',
-                'role' => 'pemilik_umkm',
+                'role' => 'penjual',
             ],
             [
                 'name' => 'Admin BUMDes Test',

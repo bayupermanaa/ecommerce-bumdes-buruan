@@ -71,6 +71,27 @@ class PaymentSubmissionServiceTest extends TestCase
         ]);
     }
 
+    public function test_new_seller_can_submit_payment_for_own_purchase_only(): void
+    {
+        Storage::fake('local');
+        $seller = User::factory()->create(['role' => 'penjual']);
+        $ownOrder = $this->order($seller);
+        $otherOrder = $this->order(User::factory()->create(['role' => 'pelanggan']));
+        $account = $this->bankAccount();
+
+        $payment = app(PaymentSubmissionService::class)->submitBankTransfer(
+            $ownOrder,
+            $seller,
+            $this->transferData($account),
+            UploadedFile::fake()->create('seller-proof.pdf', 100, 'application/pdf'),
+        );
+
+        $this->assertSame(PaymentStatus::PENDING_CONFIRMATION, $payment->status);
+        $this->assertSame($seller->id, $ownOrder->fresh()->user_id);
+        $this->expectException(AuthorizationException::class);
+        app(PaymentSubmissionService::class)->submitCashPickup($otherOrder, $seller, (string) Str::uuid());
+    }
+
     public function test_customer_cannot_submit_payment_for_another_customers_order(): void
     {
         $order = $this->order(User::factory()->create(['role' => 'pelanggan']));
@@ -213,7 +234,7 @@ class PaymentSubmissionServiceTest extends TestCase
 
     private function storeOrder(Order $order): StoreOrder
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => 'Toko Snapshot',
             'slug' => fake()->unique()->slug(),

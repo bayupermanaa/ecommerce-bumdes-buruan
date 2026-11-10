@@ -1,4 +1,13 @@
 <div>
+    <x-input-label for="pricing_type" value="Jenis Harga" />
+    <select id="pricing_type" name="pricing_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <option value="single" @selected(old('pricing_type', isset($product) && $product->variants->isNotEmpty() ? 'variants' : 'single') === 'single')>Harga tunggal</option>
+        <option value="variants" @selected(old('pricing_type', isset($product) && $product->variants->isNotEmpty() ? 'variants' : 'single') === 'variants')>Harga berdasarkan variasi ukuran</option>
+    </select>
+    <x-input-error class="mt-2" :messages="$errors->get('pricing_type')" />
+</div>
+
+<div>
     <x-input-label for="category_id" value="Kategori" />
     <select id="category_id" name="category_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
         <option value="">Pilih kategori</option>
@@ -61,3 +70,22 @@
     <x-text-input id="stock" name="stock" type="number" min="0" step="1" class="mt-1 block w-full" :value="old('stock', $product->stock ?? 0)" required />
     <x-input-error class="mt-2" :messages="$errors->get('stock')" />
 </div>
+
+<div id="variants-panel" class="space-y-3 rounded-xl border border-emerald-100 bg-emerald-50/40 p-4 {{ old('pricing_type', isset($product) && $product->variants->isNotEmpty() ? 'variants' : 'single') === 'variants' ? '' : 'hidden' }}">
+    <div class="flex items-center justify-between"><div><h3 class="font-semibold text-slate-900">Variasi ukuran</h3><p class="text-xs text-slate-600">Hanya dapat diedit sebelum produk disetujui.</p></div><button type="button" id="add-variant" class="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white">Tambah ukuran</button></div>
+    <div id="variant-rows" class="space-y-3">
+        @php($formVariants = old('variants', isset($product) ? $product->variants->toArray() : [['label' => '', 'sku' => '', 'price' => '', 'stock' => 0]]))
+        @foreach ($formVariants as $i => $variant)
+            <div class="variant-row grid gap-2 rounded-lg bg-white p-3 sm:grid-cols-5"><input name="variants[{{ $i }}][label]" value="{{ $variant['label'] ?? '' }}" placeholder="Ukuran" class="rounded-md border-gray-300 text-sm"><input name="variants[{{ $i }}][sku]" value="{{ $variant['sku'] ?? '' }}" placeholder="SKU variasi" class="rounded-md border-gray-300 text-sm"><input name="variants[{{ $i }}][price]" value="{{ $variant['price'] ?? '' }}" type="number" min="0" step="0.01" placeholder="Harga" class="rounded-md border-gray-300 text-sm"><input name="variants[{{ $i }}][stock]" value="{{ $variant['stock'] ?? 0 }}" type="number" min="0" step="1" placeholder="Stok" class="rounded-md border-gray-300 text-sm"><button type="button" class="remove-variant rounded-md border border-red-200 px-2 py-2 text-xs font-semibold text-red-700">Hapus</button></div>
+        @endforeach
+    </div>
+    <x-input-error class="mt-2" :messages="$errors->get('variants')" />
+</div>
+
+@once
+<script>
+const variantPanel=document.getElementById('variants-panel'); const pricingType=document.getElementById('pricing_type'); pricingType?.addEventListener('change',()=>variantPanel?.classList.toggle('hidden',pricingType.value!=='variants'));
+document.getElementById('add-variant')?.addEventListener('click',()=>{const box=document.getElementById('variant-rows');const i=box.querySelectorAll('.variant-row').length;box.insertAdjacentHTML('beforeend',`<div class="variant-row grid gap-2 rounded-lg bg-white p-3 sm:grid-cols-5"><input name="variants[${i}][label]" placeholder="Ukuran" class="rounded-md border-gray-300 text-sm" required><input name="variants[${i}][sku]" placeholder="SKU variasi" class="rounded-md border-gray-300 text-sm" required><input name="variants[${i}][price]" type="number" min="0" step="0.01" placeholder="Harga" class="rounded-md border-gray-300 text-sm" required><input name="variants[${i}][stock]" type="number" min="0" step="1" placeholder="Stok" class="rounded-md border-gray-300 text-sm" required><button type="button" class="remove-variant rounded-md border border-red-200 px-2 py-2 text-xs font-semibold text-red-700">Hapus</button></div>`)});
+document.addEventListener('click',e=>{if(e.target.classList.contains('remove-variant'))e.target.closest('.variant-row')?.remove()});
+</script>
+@endonce

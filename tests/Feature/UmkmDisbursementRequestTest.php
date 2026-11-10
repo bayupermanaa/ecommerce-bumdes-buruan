@@ -101,7 +101,7 @@ class UmkmDisbursementRequestTest extends TestCase
     /** @return array{User, \App\Models\UmkmStore, \App\Models\UmkmRecipientBankAccount, UmkmEntitlement, UmkmEntitlement} */
     private function storeWithEntitlements(bool $verified = true): array
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Uji', 'slug' => 'toko-'.Str::lower(Str::random(10)), 'status' => 'approved']);
         $account = $store->recipientBankAccounts()->create([
             'bank_name' => 'Bank Uji', 'account_holder_name' => $owner->name, 'account_number' => '00123456789',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\StoreOrder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -85,22 +86,45 @@ class OrderController extends Controller
                 ->orderBy('product_id')
                 ->lockForUpdate()
                 ->get();
-            $quantities = $items->groupBy('product_id')->map(
+            $plainQuantities = $items->whereNull('product_variant_id')->groupBy('product_id')->map(
                 fn ($productItems): int => $productItems->sum('quantity')
             );
+            $variantQuantities = $items->whereNotNull('product_variant_id')->groupBy('product_variant_id')->map(
+                fn ($variantItems): int => $variantItems->sum('quantity')
+            );
             $products = Product::query()
-                ->whereIn('id', $quantities->keys())
+                ->whereIn('id', $items->pluck('product_id')->unique())
                 ->orderBy('id')
                 ->lockForUpdate()
                 ->get()
                 ->keyBy('id');
 
-            if ($products->count() !== $quantities->count()) {
+            $variants = $variantQuantities->isEmpty()
+                ? collect()
+                : ProductVariant::query()
+                    ->whereIn('id', $variantQuantities->keys())
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+            if ($products->count() !== $items->pluck('product_id')->unique()->count()
+                || $variants->count() !== $variantQuantities->count()) {
                 throw new \LogicException('Produk pada pesanan tidak lengkap.');
             }
 
-            foreach ($quantities as $productId => $quantity) {
+            foreach ($items->whereNotNull('product_variant_id') as $item) {
+                if ($variants->get($item->product_variant_id)->product_id !== $item->product_id) {
+                    throw new \LogicException('Variasi pada pesanan tidak cocok dengan produk.');
+                }
+            }
+
+            foreach ($plainQuantities as $productId => $quantity) {
                 $products->get($productId)->increment('stock', $quantity);
+            }
+
+            foreach ($variantQuantities as $variantId => $quantity) {
+                $variants->get($variantId)->increment('stock', $quantity);
             }
 
             foreach ($storeOrders as $storeOrder) {

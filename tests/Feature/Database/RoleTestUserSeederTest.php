@@ -20,7 +20,7 @@ class RoleTestUserSeederTest extends TestCase
         $this->assertDatabaseCount('users', 4);
 
         $expectedUsers = [
-            ['email' => 'umkm@test.com', 'name' => 'Pemilik UMKM Test', 'role' => 'pemilik_umkm'],
+            ['email' => 'umkm@test.com', 'name' => 'Penjual Test', 'role' => 'penjual'],
             ['email' => 'admin@test.com', 'name' => 'Admin BUMDes Test', 'role' => 'admin_bumdes'],
             ['email' => 'kurir@test.com', 'name' => 'Kurir Test', 'role' => 'kurir'],
             ['email' => 'kepala@test.com', 'name' => 'Kepala BUMDes Test', 'role' => 'kepala_bumdes'],

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const credentials = {
     admin_bumdes: ['admin.e2e@example.test', 'password123'],
-    pemilik_umkm: ['umkm.e2e@example.test', 'password123'],
+    penjual: ['umkm.e2e@example.test', 'password123'],
     pelanggan: ['pelanggan.e2e@example.test', 'password123'],
     kepala_bumdes: ['kepala.e2e@example.test', 'password123'],
     kurir: ['kurir.e2e@example.test', 'password123'],
@@ -11,7 +11,7 @@ const credentials = {
 
 const dashboards = {
     admin_bumdes: '/admin/dashboard',
-    pemilik_umkm: '/umkm/dashboard',
+    penjual: '/umkm/dashboard',
     pelanggan: '/pelanggan/dashboard',
     kepala_bumdes: '/kepala-bumdes/dashboard',
     kurir: '/kurir/dashboard',
@@ -22,7 +22,7 @@ const roleChecks = {
         text: 'Ringkasan operasional',
         paths: ['/admin/umkm-stores', '/admin/products', '/admin/pembayaran', '/admin/pencairan-umkm', '/admin/audit-keuangan'],
     },
-    pemilik_umkm: {
+    penjual: {
         text: 'Kelola profil toko',
         paths: ['/umkm/stores', '/umkm/products', '/umkm/orders', '/umkm/commission-agreements', '/umkm/pencairan'],
     },
@@ -42,7 +42,7 @@ const roleChecks = {
 
 const screenshotDirectories = {
     admin_bumdes: 'admin',
-    pemilik_umkm: 'umkm',
+    penjual: 'umkm',
     pelanggan: 'customer',
     kepala_bumdes: 'kepala-bumdes',
     kurir: 'kurir',

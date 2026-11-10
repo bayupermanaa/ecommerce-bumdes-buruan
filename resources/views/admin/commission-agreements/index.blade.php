@@ -1,4 +1,4 @@
-<x-admin-layout title="Perjanjian Komisi UMKM">
+<x-admin-layout title="Perjanjian Komisi Penjual">
 
     <div>
         <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
@@ -36,7 +36,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="5" class="px-3 py-8 text-center text-gray-600">Belum ada toko UMKM.</td></tr>
+                                <tr><td colspan="5" class="px-3 py-8 text-center text-gray-600">Belum ada toko Penjual.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

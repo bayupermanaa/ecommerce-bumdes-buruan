@@ -175,7 +175,7 @@ class PaymentFulfillmentIntegrationTest extends TestCase
         $products = collect();
 
         for ($index = 1; $index <= $count; $index++) {
-            $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+            $owner = User::factory()->create(['role' => 'penjual']);
             $store = $owner->umkmStore()->create([
                 'name' => "Toko {$index}",
                 'slug' => 'toko-'.Str::lower(Str::random(12)),

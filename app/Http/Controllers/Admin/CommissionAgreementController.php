@@ -17,7 +17,7 @@ use Illuminate\View\View;
 class CommissionAgreementController extends Controller
 {
     /**
-     * List each UMKM and its commission agreement history.
+     * List each Penjual and its commission agreement history.
      */
     public function index(): View
     {
@@ -265,7 +265,7 @@ class CommissionAgreementController extends Controller
     }
 
     /**
-     * The locked store serializes activation attempts for the same UMKM.
+     * The locked store serializes activation attempts for the same Penjual.
      */
     private function hasOverlappingActiveAgreement(CommissionAgreement $agreement): bool
     {

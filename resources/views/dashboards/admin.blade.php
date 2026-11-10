@@ -4,15 +4,40 @@
             <div>
                 <p class="text-sm font-medium text-slate-500">Selamat datang kembali, {{ auth()->user()->name }}.</p>
                 <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Ringkasan operasional</h2>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Pantau proses pembayaran, hak UMKM, dan pekerjaan verifikasi dari satu tempat.</p>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Pantau proses pembayaran, hak Penjual, dan pekerjaan verifikasi dari satu tempat.</p>
             </div>
             <span class="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700"><span class="h-2 w-2 rounded-full bg-emerald-500"></span>Akses Admin BUMDes aktif</span>
+        </section>
+
+        <section aria-labelledby="operational-summary-heading">
+            <div class="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                <div>
+                    <h3 id="operational-summary-heading" class="text-base font-bold text-slate-900">Aktivitas marketplace</h3>
+                    <p class="mt-1 text-sm text-slate-500">Jumlah data saat ini, diperbarui saat halaman dibuka.</p>
+                </div>
+                <a href="{{ route('admin.sellers.index') }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">Lihat Data Penjual <span aria-hidden="true">&rarr;</span></a>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                @foreach ([
+                    ['Semua toko', 'stores', 'Seluruh pengajuan', 'text-slate-900'],
+                    ['Menunggu verifikasi', 'pending_stores', 'Perlu ditinjau', 'text-amber-700'],
+                    ['Toko aktif', 'approved_stores', 'Status disetujui', 'text-emerald-700'],
+                    ['Produk', 'products', 'Seluruh status produk', 'text-blue-700'],
+                    ['Pesanan', 'orders', 'Seluruh status pesanan', 'text-slate-900'],
+                ] as [$label, $key, $caption, $tone])
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p class="text-sm font-medium text-slate-500">{{ $label }}</p>
+                        <p class="mt-3 text-3xl font-bold tracking-tight {{ $tone }}">{{ number_format($operationalSummary[$key], 0, ',', '.') }}</p>
+                        <p class="mt-2 text-xs text-slate-500">{{ $caption }}</p>
+                    </div>
+                @endforeach
+            </div>
         </section>
 
         <section aria-labelledby="entitlement-summary-heading">
             <div class="mb-4 flex items-center justify-between">
                 <div>
-                    <h3 id="entitlement-summary-heading" class="text-base font-bold text-slate-900">Monitoring hak UMKM</h3>
+                    <h3 id="entitlement-summary-heading" class="text-base font-bold text-slate-900">Monitoring hak Penjual</h3>
                     <p class="mt-1 text-sm text-slate-500">Ringkasan status entitlement saat ini.</p>
                 </div>
                 <a href="{{ route('admin.umkm-entitlements.index') }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">Buka rekonsiliasi <span aria-hidden="true">→</span></a>
@@ -34,11 +59,12 @@
             <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 @foreach([
                     ['admin.payments.index', 'Verifikasi Pembayaran', 'Periksa transfer dan penerimaan tunai.', 'bg-blue-50 text-blue-700'],
-                    ['admin.umkm-stores.index', 'Verifikasi Toko UMKM', 'Tinjau pengajuan toko baru.', 'bg-slate-100 text-slate-700'],
+                    ['admin.umkm-stores.index', 'Verifikasi Toko Penjual', 'Tinjau pengajuan toko baru.', 'bg-slate-100 text-slate-700'],
+                    ['admin.sellers.index', 'Data Penjual', 'Cari dan lihat seluruh toko terdaftar.', 'bg-blue-50 text-blue-700'],
                     ['admin.products.index', 'Verifikasi Produk', 'Kelola produk yang menunggu pemeriksaan.', 'bg-slate-100 text-slate-700'],
-                    ['admin.product-revisions.index', 'Revisi Produk', 'Tinjau perubahan dari pemilik UMKM.', 'bg-slate-100 text-slate-700'],
+                    ['admin.product-revisions.index', 'Revisi Produk', 'Tinjau perubahan dari penjual.', 'bg-slate-100 text-slate-700'],
                     ['admin.commission-agreements.index', 'Perjanjian Komisi', 'Kelola konfigurasi perjanjian komisi.', 'bg-emerald-50 text-emerald-700'],
-                    ['admin.disbursements.index', 'Pencairan UMKM', 'Periksa proses dan bukti pencairan.', 'bg-amber-50 text-amber-700'],
+                    ['admin.disbursements.index', 'Pencairan Penjual', 'Periksa proses dan bukti pencairan.', 'bg-amber-50 text-amber-700'],
                     ['admin.financial-audit.index', 'Audit Keuangan', 'Tinjau exception keuangan read-only.', 'bg-rose-50 text-rose-700'],
                 ] as [$routeName, $label, $description, $badgeClass])
                     <a href="{{ route($routeName) }}" class="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
@@ -50,7 +76,7 @@
             </div>
             <div class="mt-6 grid gap-3 border-t border-slate-100 pt-5 sm:grid-cols-2">
                 <a href="{{ route('admin.bumdes-bank-accounts.index') }}" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Kelola rekening resmi BUMDes <span class="float-right">→</span></a>
-                <a href="{{ route('admin.recipient-bank-accounts.index') }}" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Verifikasi rekening UMKM <span class="float-right">→</span></a>
+                <a href="{{ route('admin.recipient-bank-accounts.index') }}" class="rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Verifikasi rekening Penjual <span class="float-right">→</span></a>
             </div>
         </section>
     </div>

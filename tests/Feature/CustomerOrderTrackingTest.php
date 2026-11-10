@@ -97,7 +97,7 @@ class CustomerOrderTrackingTest extends TestCase
 
     private function storeOrder(Order $order, string $storeName, string $status): StoreOrder
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => $storeName, 'slug' => 'toko-'.Str::lower(Str::random(12))]);
         $category = Category::create(['name' => 'Kategori '.Str::random(6), 'slug' => 'kategori-'.Str::lower(Str::random(12))]);
         $product = $store->products()->create([

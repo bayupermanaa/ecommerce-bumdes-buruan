@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\UmkmStore;
 use App\Models\User;
+use App\Support\UserRoles;
 
 class UmkmStorePolicy
 {
@@ -20,7 +21,26 @@ class UmkmStorePolicy
      */
     public function create(User $user): bool
     {
-        return ! $user->umkmStore()->exists();
+        return UserRoles::canBuy($user->role)
+            && ! $user->umkmStore()->exists();
+    }
+
+    /**
+     * A public seller application always starts from an ordinary customer account.
+     */
+    public function apply(User $user): bool
+    {
+        return $user->role === 'pelanggan' && ! $user->umkmStore()->exists();
+    }
+
+    /**
+     * A rejected applicant may correct only their own existing application.
+     */
+    public function resubmit(User $user, UmkmStore $umkmStore): bool
+    {
+        return $user->role === 'pelanggan'
+            && $umkmStore->user_id === $user->id
+            && $umkmStore->status === 'rejected';
     }
 
     /**
@@ -28,7 +48,8 @@ class UmkmStorePolicy
      */
     public function view(User $user, UmkmStore $umkmStore): bool
     {
-        return $user->role === 'admin_bumdes' || $user->id === $umkmStore->user_id;
+        return $user->role === 'admin_bumdes'
+            || (UserRoles::isSeller($user->role) && $user->id === $umkmStore->user_id);
     }
 
     /**
@@ -36,7 +57,7 @@ class UmkmStorePolicy
      */
     public function update(User $user, UmkmStore $umkmStore): bool
     {
-        return $user->id === $umkmStore->user_id;
+        return UserRoles::isSeller($user->role) && $user->id === $umkmStore->user_id;
     }
 
     /**

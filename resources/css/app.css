@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Keep Admin scrolling available while hiding browser scrollbar chrome. */
+.admin-scrollbar-hidden {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Legacy Edge */
+}
+
+.admin-scrollbar-hidden::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none; /* Chrome and Chromium Edge */
+}
+
+/* Shared table and form treatment within the Seller portal only. */
+.seller-portal main table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.seller-portal main thead {
+    background-color: rgb(248 250 252);
+    color: rgb(71 85 105);
+}
+
+.seller-portal main tbody tr {
+    transition: background-color 150ms ease;
+}
+
+.seller-portal main tbody tr:hover {
+    background-color: rgb(248 250 252);
+}
+
+.seller-portal main input:focus-visible,
+.seller-portal main select:focus-visible,
+.seller-portal main textarea:focus-visible {
+    outline: 2px solid rgb(5 150 105);
+    outline-offset: 2px;
+}

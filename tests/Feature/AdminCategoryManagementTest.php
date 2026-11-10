@@ -24,7 +24,7 @@ class AdminCategoryManagementTest extends TestCase
             ->assertOk()
             ->assertSee('Manajemen Kategori Produk');
 
-        foreach (['pelanggan', 'pemilik_umkm', 'kepala_bumdes', 'kurir'] as $role) {
+        foreach (['pelanggan', 'penjual', 'kepala_bumdes', 'kurir'] as $role) {
             $this->actingAs(User::factory()->create(['role' => $role]))
                 ->get(route('admin.categories.index'))
                 ->assertForbidden();
@@ -98,7 +98,7 @@ class AdminCategoryManagementTest extends TestCase
     public function test_category_used_by_a_product_or_revision_cannot_be_deleted(): void
     {
         $admin = User::factory()->create(['role' => 'admin_bumdes']);
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Uji', 'slug' => 'toko-uji-kategori']);
         $productCategory = Category::create(['name' => 'Produk', 'slug' => 'produk']);
         $revisionCategory = Category::create(['name' => 'Revisi', 'slug' => 'revisi']);
@@ -132,7 +132,7 @@ class AdminCategoryManagementTest extends TestCase
 
     public function test_only_active_categories_are_available_for_new_products_while_current_inactive_category_remains_editable(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Produk', 'slug' => 'toko-produk-kategori']);
         $store->forceFill(['status' => 'approved'])->save();
         $active = Category::create(['name' => 'Kategori Aktif', 'slug' => 'kategori-aktif', 'is_active' => true]);

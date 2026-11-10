@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PaymentVerificationController;
 use App\Http\Controllers\Admin\UmkmEntitlementController;
 use App\Http\Controllers\Admin\UmkmDisbursementReviewController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\SellerDirectoryController;
 use App\Http\Controllers\Admin\UmkmRecipientBankAccountVerificationController;
 use App\Http\Controllers\Admin\FinancialAuditController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -24,11 +25,13 @@ use App\Http\Controllers\Umkm\StoreOrderController;
 use App\Http\Controllers\Umkm\RecipientBankAccountController;
 use App\Http\Controllers\Umkm\DisbursementRequestController;
 use App\Http\Controllers\UmkmStoreController;
+use App\Http\Controllers\SellerApplicationController;
 use App\Http\Controllers\KepalaBumdesMonitoringController;
 use App\Http\Controllers\KepalaBumdesDisbursementApprovalController;
 use App\Http\Controllers\KepalaBumdes\CommissionReportController;
 use App\Http\Controllers\KepalaBumdes\UmkmFinancialReportController;
 use Illuminate\Support\Facades\Route;
+use App\Support\UserRoles;
 
 Route::get('/', function () {
     return redirect()->route('catalog.index');
@@ -39,7 +42,7 @@ Route::get('/katalog/{slug}', [CatalogController::class, 'show'])->name('catalog
 
 Route::get('/dashboard', function () {
     return match (request()->user()?->role) {
-        'pemilik_umkm' => redirect()->route('umkm.dashboard'),
+        UserRoles::SELLER, UserRoles::LEGACY_SELLER => redirect()->route('umkm.dashboard'),
         'admin_bumdes' => redirect()->route('admin.dashboard'),
         'kurir' => redirect()->route('kurir.dashboard'),
         'kepala_bumdes' => redirect()->route('kepala-bumdes.dashboard'),
@@ -49,6 +52,16 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::view('/pelanggan/dashboard', 'dashboards.pelanggan')->name('pelanggan.dashboard');
+
+    Route::post('/mulai-berjualan', [SellerApplicationController::class, 'store'])
+        ->name('seller-application.store');
+    Route::patch('/mulai-berjualan/{store}/ajukan-ulang', [SellerApplicationController::class, 'resubmit'])
+        ->name('seller-application.resubmit');
+});
+
+Route::middleware(['auth', 'role:pelanggan,penjual'])->group(function () {
+    Route::get('/mulai-berjualan', [SellerApplicationController::class, 'show'])
+        ->name('seller-application.show');
 
     Route::prefix('keranjang')->name('cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
@@ -67,8 +80,8 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::patch('/pesanan/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
 
-Route::middleware(['auth', 'role:pemilik_umkm'])->group(function () {
-    Route::view('/umkm/dashboard', 'dashboards.umkm')->name('umkm.dashboard');
+Route::middleware(['auth', 'role:penjual'])->group(function () {
+    Route::get('/umkm/dashboard', [\App\Http\Controllers\Umkm\SellerDashboardController::class, 'index'])->name('umkm.dashboard');
 
     Route::prefix('umkm')->name('umkm.')->group(function () {
         Route::resource('stores', UmkmStoreController::class)
@@ -105,6 +118,8 @@ Route::middleware(['auth', 'role:admin_bumdes'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('penjual', [SellerDirectoryController::class, 'index'])->name('sellers.index');
+        Route::get('penjual/{store}', [SellerDirectoryController::class, 'show'])->name('sellers.show');
         Route::resource('categories', CategoryController::class)->except('show');
 
         Route::get('audit-keuangan', [FinancialAuditController::class, 'index'])

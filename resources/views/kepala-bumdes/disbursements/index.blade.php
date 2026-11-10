@@ -1,5 +1,5 @@
-<x-kepala-bumdes-layout title="Persetujuan Pencairan UMKM">
-    <x-slot name="header"><h2 class="font-semibold text-xl">Persetujuan Pencairan UMKM</h2></x-slot>
+<x-kepala-bumdes-layout title="Persetujuan Pencairan Penjual">
+    <x-slot name="header"><h2 class="font-semibold text-xl">Persetujuan Pencairan Penjual</h2></x-slot>
     <div class="py-12"><div class="max-w-7xl mx-auto space-y-4 sm:px-6 lg:px-8">
         @if (session('status'))<div class="rounded bg-green-50 p-3 text-green-700">{{ session('status') }}</div>@endif
         <div class="overflow-x-auto rounded bg-white shadow"><table class="min-w-full text-sm">

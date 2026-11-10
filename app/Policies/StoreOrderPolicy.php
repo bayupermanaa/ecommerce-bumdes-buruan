@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\StoreOrder;
 use App\Models\User;
+use App\Support\UserRoles;
 
 class StoreOrderPolicy
 {
@@ -12,7 +13,7 @@ class StoreOrderPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'pemilik_umkm' && $user->umkmStore()->exists();
+        return UserRoles::isSeller($user->role) && $user->umkmStore()->exists();
     }
 
     /**
@@ -33,7 +34,7 @@ class StoreOrderPolicy
 
     private function ownsStoreOrder(User $user, StoreOrder $storeOrder): bool
     {
-        return $user->role === 'pemilik_umkm'
+        return UserRoles::isSeller($user->role)
             && $storeOrder->umkmStore !== null
             && $storeOrder->umkmStore->user_id === $user->id;
     }

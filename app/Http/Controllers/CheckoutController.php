@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\StoreOrder;
 use App\Models\UmkmStore;
 use App\Services\CommissionCalculationService;
@@ -13,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -24,9 +26,15 @@ class CheckoutController extends Controller
      */
     public function index(Request $request): View
     {
+        $variantReady = Schema::hasColumn('cart_items', 'variant_identity');
+        $relations = ['items.product.category', 'items.product.umkmStore'];
+        if ($variantReady) {
+            $relations[] = 'items.variant';
+            $relations['items.product'] = fn ($query) => $query->withExists('variants');
+        }
         $cart = Cart::query()
             ->where('user_id', $request->user()->id)
-            ->with(['items.product.category', 'items.product.umkmStore'])
+            ->with($relations)
             ->first();
         $items = $cart?->items ?? collect();
 
@@ -35,7 +43,7 @@ class CheckoutController extends Controller
             ->map(function (Collection $items): array {
                 $store = $items->first()->product->umkmStore;
                 $subtotalInMinorUnits = $items->sum(
-                    fn ($item): int => $this->toMinorUnits((string) $item->product->price) * $item->quantity
+                    fn ($item): int => $this->toMinorUnits((string) ($item->variant?->price ?? $item->product->price)) * $item->quantity
                 );
 
                 return [
@@ -128,12 +136,25 @@ class CheckoutController extends Controller
                 throw ValidationException::withMessages(['cart' => 'Keranjang Anda kosong.']);
             }
 
-            $products = Product::query()
+            $variantReady = Schema::hasColumn('cart_items', 'variant_identity');
+            $productQuery = Product::query();
+            if ($variantReady) {
+                $productQuery->withExists('variants');
+            }
+            $products = $productQuery
                 ->whereIn('id', $cartItems->pluck('product_id'))
                 ->orderBy('id')
                 ->lockForUpdate()
                 ->get()
                 ->keyBy('id');
+            $variants = $variantReady
+                ? ProductVariant::query()
+                    ->whereIn('id', $cartItems->pluck('product_variant_id')->filter()->unique())
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id')
+                : collect();
             $storeIds = $products->pluck('umkm_store_id')->unique()->sort()->values();
             $stores = UmkmStore::query()
                 ->whereIn('id', $storeIds)
@@ -142,9 +163,14 @@ class CheckoutController extends Controller
                 ->get()
                 ->keyBy('id');
 
-            $lines = $cartItems->map(function (CartItem $item) use ($products, $stores): array {
+            $lines = $cartItems->map(function (CartItem $item) use ($products, $stores, $variants, $variantReady): array {
                 $product = $products->get($item->product_id);
                 $store = $product ? $stores->get($product->umkm_store_id) : null;
+                $variant = $item->product_variant_id ? $variants->get($item->product_variant_id) : null;
+
+                if ($variantReady && (int) $item->variant_identity !== ($item->product_variant_id ?? 0)) {
+                    throw ValidationException::withMessages(['cart' => 'Identitas variasi pada keranjang tidak valid.']);
+                }
 
                 if (! $product || ! $store || $product->status !== 'approved' || $store->status !== 'approved') {
                     throw ValidationException::withMessages([
@@ -152,16 +178,24 @@ class CheckoutController extends Controller
                     ]);
                 }
 
-                if ($item->quantity > $product->stock) {
+                if ($item->product_variant_id !== null) {
+                    if (! $variant || $variant->product_id !== $product->id || ! $variant->is_active) {
+                        throw ValidationException::withMessages(['cart' => 'Variasi produk tidak lagi tersedia.']);
+                    }
+                } elseif ($variantReady && $product->variants_exists) {
+                    throw ValidationException::withMessages(['cart' => 'Pilih variasi produk sebelum checkout.']);
+                }
+
+                if ($item->quantity > ($variant ?? $product)->stock) {
                     throw ValidationException::withMessages([
                         'cart' => "Stok {$product->name} tidak mencukupi.",
                     ]);
                 }
 
-                return compact('item', 'product', 'store');
+                return compact('item', 'product', 'store', 'variant');
             });
             $subtotalInMinorUnits = $lines->sum(
-                fn (array $line): int => $this->toMinorUnits((string) $line['product']->price) * $line['item']->quantity
+                fn (array $line): int => $this->toMinorUnits((string) ($line['variant']?->price ?? $line['product']->price)) * $line['item']->quantity
             );
             $subtotal = $this->fromMinorUnits($subtotalInMinorUnits);
             $order = Order::create([
@@ -182,7 +216,7 @@ class CheckoutController extends Controller
                 /** @var UmkmStore $store */
                 $store = $storeLines->first()['store'];
                 $storeSubtotalInMinorUnits = $storeLines->sum(
-                    fn (array $line): int => $this->toMinorUnits((string) $line['product']->price) * $line['item']->quantity
+                    fn (array $line): int => $this->toMinorUnits((string) ($line['variant']?->price ?? $line['product']->price)) * $line['item']->quantity
                 );
                 $storeSubtotal = $this->fromMinorUnits($storeSubtotalInMinorUnits);
                 $commission = $commissionService->calculateForStore($store, $storeSubtotal, $transactionDate);
@@ -219,15 +253,18 @@ class CheckoutController extends Controller
                     $product = $line['product'];
                     /** @var CartItem $item */
                     $item = $line['item'];
+                    $variant = $line['variant'];
                     $lineTotal = $this->fromMinorUnits(
-                        $this->toMinorUnits((string) $product->price) * $item->quantity
+                        $this->toMinorUnits((string) ($variant?->price ?? $product->price)) * $item->quantity
                     );
 
                     return [
                         'product_id' => $product->id,
+                        ...($variant ? ['product_variant_id' => $variant->id] : []),
                         'product_name_snapshot' => $product->name,
                         'sku_snapshot' => $product->sku,
-                        'unit_price' => $product->price,
+                        ...($variant ? ['variant_label_snapshot' => $variant->label, 'variant_sku_snapshot' => $variant->sku] : []),
+                        'unit_price' => $variant?->price ?? $product->price,
                         'quantity' => $item->quantity,
                         'line_total' => $lineTotal,
                     ];
@@ -237,7 +274,7 @@ class CheckoutController extends Controller
             $lines->each(function (array $line): void {
                 /** @var Product $product */
                 $product = $line['product'];
-                $product->decrement('stock', $line['item']->quantity);
+                ($line['variant'] ?? $product)->decrement('stock', $line['item']->quantity);
             });
 
             CartItem::query()->where('cart_id', $cart->id)->delete();
@@ -261,7 +298,9 @@ class CheckoutController extends Controller
 
         return $product->status === 'approved'
             && $product->umkmStore?->status === 'approved'
-            && $product->stock >= $item->quantity;
+            && ($item->product_variant_id === null
+                ? ! $product->variants_exists && $product->stock >= $item->quantity
+                : $item->variant?->product_id === $product->id && $item->variant?->is_active && $item->variant->stock >= $item->quantity);
     }
 
     /**

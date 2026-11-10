@@ -22,6 +22,7 @@ class AuthenticationTest extends TestCase
         $cases = [
             'pelanggan' => route('pelanggan.dashboard', absolute: false),
             'pemilik_umkm' => route('umkm.dashboard', absolute: false),
+            'penjual' => route('umkm.dashboard', absolute: false),
             'admin_bumdes' => route('admin.dashboard', absolute: false),
             'kurir' => route('kurir.dashboard', absolute: false),
             'kepala_bumdes' => route('kepala-bumdes.dashboard', absolute: false),

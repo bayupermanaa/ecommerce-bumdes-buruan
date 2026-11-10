@@ -344,7 +344,7 @@ class OrderCheckoutTest extends TestCase
         string $productStatus = 'approved',
         string $storeStatus = 'approved',
     ): Product {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => $storeName,
             'slug' => fake()->unique()->slug(),

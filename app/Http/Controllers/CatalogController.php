@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class CatalogController extends Controller
 {
     /**
-     * Display publicly available products from approved UMKM stores.
+     * Display publicly available products from approved Penjual stores.
      */
     public function index(Request $request): View
     {
@@ -25,8 +25,8 @@ class CatalogController extends Controller
         $products = $this->approvedProducts()
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $query->where('name', 'like', "%{$search}%"))
             ->when($filters['category'] ?? null, fn (Builder $query, int $categoryId) => $query->where('category_id', $categoryId))
-            ->when(($filters['sort'] ?? 'latest') === 'price_asc', fn (Builder $query) => $query->orderBy('price'))
-            ->when(($filters['sort'] ?? 'latest') === 'price_desc', fn (Builder $query) => $query->orderByDesc('price'))
+            ->when(($filters['sort'] ?? 'latest') === 'price_asc', fn (Builder $query) => $query->orderByRaw('COALESCE(active_min_price, price) asc'))
+            ->when(($filters['sort'] ?? 'latest') === 'price_desc', fn (Builder $query) => $query->orderByRaw('COALESCE(active_max_price, price) desc'))
             ->when(($filters['sort'] ?? 'latest') === 'latest', fn (Builder $query) => $query->latest())
             ->paginate(12)
             ->withQueryString();
@@ -66,7 +66,9 @@ class CatalogController extends Controller
     private function approvedProducts(): Builder
     {
         return Product::query()
-            ->with(['category', 'umkmStore'])
+            ->with(['category', 'umkmStore', 'activeVariants'])
+            ->withMin('activeVariants as active_min_price', 'price')
+            ->withMax('activeVariants as active_max_price', 'price')
             ->tap(fn (Builder $query) => $this->applyCatalogVisibility($query));
     }
 

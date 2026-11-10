@@ -188,7 +188,7 @@ class FinancialExceptionDetectorBatchCTest extends TestCase
 
     private function makeStore(string $name): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         return $owner->umkmStore()->create([
             'name' => $name,

@@ -134,7 +134,7 @@ class BumdesBankAccountManagementTest extends TestCase
         $this->get(route('admin.bumdes-bank-accounts.index'))
             ->assertRedirect(route('login'));
 
-        foreach (['pelanggan', 'pemilik_umkm', 'kurir', 'kepala_bumdes'] as $role) {
+        foreach (['pelanggan', 'penjual', 'kurir', 'kepala_bumdes'] as $role) {
             $this->actingAs(User::factory()->create(['role' => $role]))
                 ->get(route('admin.bumdes-bank-accounts.index'))
                 ->assertForbidden();

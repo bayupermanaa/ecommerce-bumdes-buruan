@@ -13,7 +13,7 @@ use Illuminate\View\View;
 class ProductVerificationController extends Controller
 {
     /**
-     * Display all UMKM products, optionally filtered by status.
+     * Display all Penjual products, optionally filtered by status.
      */
     public function index(Request $request): View
     {

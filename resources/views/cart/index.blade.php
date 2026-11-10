@@ -21,7 +21,7 @@
         @if (! $cart || $cart->items->isEmpty())
             <div class="mt-8 rounded-lg border border-dashed border-gray-300 bg-white px-6 py-16 text-center shadow-sm">
                 <h2 class="text-lg font-semibold text-gray-900">Keranjang Anda masih kosong</h2>
-                <p class="mt-2 text-sm text-gray-600">Temukan produk UMKM Desa Buruan yang Anda sukai.</p>
+                <p class="mt-2 text-sm text-gray-600">Temukan produk Penjual Desa Buruan yang Anda sukai.</p>
                 <a href="{{ route('catalog.index') }}" class="mt-6 inline-flex rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">Lihat Katalog</a>
             </div>
         @else
@@ -29,8 +29,9 @@
             <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_20rem]">
                 <div class="space-y-4">
                     @foreach ($cart->items as $item)
-                        @php($available = $item->product->status === 'approved' && $item->product->umkmStore?->status === 'approved' && $item->product->stock > 0)
-                        @php($subtotal = (float) $item->product->price * $item->quantity)
+                        @php($stockSource = $item->variant ?? $item->product)
+                        @php($available = $item->product->status === 'approved' && $item->product->umkmStore?->status === 'approved' && ($item->product_variant_id === null ? ! $item->product->variants_exists : ($item->variant?->product_id === $item->product_id && $item->variant?->is_active)) && $stockSource->stock >= $item->quantity)
+                        @php($subtotal = (float) $stockSource->price * $item->quantity)
                         @php($total += $subtotal)
                         <article class="flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                             @if ($item->product->image_path)
@@ -42,13 +43,14 @@
                                 <div class="flex flex-wrap items-start justify-between gap-3">
                                     <div>
                                         <h2 class="font-semibold text-gray-900">{{ $item->product->name }}</h2>
+                                        @if($item->product_variant_id)<p class="mt-1 text-sm text-emerald-700">Ukuran: {{ $item->variant?->label ?? 'Tidak tersedia' }}</p>@endif
                                         <p class="mt-1 text-sm text-gray-600">{{ $item->product->umkmStore?->name ?? 'Toko tidak tersedia' }}</p>
                                     </div>
                                     <p class="font-semibold text-gray-900">Rp {{ number_format($subtotal, 0, ',', '.') }}</p>
                                 </div>
-                                <p class="mt-2 text-sm text-gray-700">Harga saat ini: Rp {{ number_format((float) $item->product->price, 0, ',', '.') }}</p>
+                                <p class="mt-2 text-sm text-gray-700">Harga saat ini: Rp {{ number_format((float) $stockSource->price, 0, ',', '.') }}</p>
                                 @if ($available)
-                                    <p class="mt-1 text-xs text-green-700">Stok tersedia: {{ $item->product->stock }}</p>
+                                    <p class="mt-1 text-xs text-green-700">Stok tersedia: {{ $stockSource->stock }}</p>
                                 @else
                                     <p class="mt-1 text-xs font-medium text-red-700">Produk tidak tersedia saat ini. Hapus item ini sebelum checkout.</p>
                                 @endif
@@ -59,7 +61,7 @@
                                             @method('PATCH')
                                             <div>
                                                 <label for="quantity-{{ $item->id }}" class="text-xs font-medium text-gray-700">Jumlah</label>
-                                                <input id="quantity-{{ $item->id }}" name="quantity" type="number" min="1" max="{{ $item->product->stock }}" value="{{ $item->quantity }}" class="mt-1 block w-20 rounded-md border-gray-300 text-sm shadow-sm focus:border-green-600 focus:ring-green-600" required>
+                                                <input id="quantity-{{ $item->id }}" name="quantity" type="number" min="1" max="{{ $stockSource->stock }}" value="{{ $item->quantity }}" class="mt-1 block w-20 rounded-md border-gray-300 text-sm shadow-sm focus:border-green-600 focus:ring-green-600" required>
                                             </div>
                                             <button type="submit" class="rounded-md border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Perbarui</button>
                                         </form>

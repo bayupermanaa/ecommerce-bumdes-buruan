@@ -266,7 +266,7 @@ class CommissionAgreementTest extends TestCase
 
     private function approvedStore(string $name): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => $name,
             'slug' => fake()->unique()->slug(),

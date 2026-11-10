@@ -26,7 +26,7 @@ $users = [];
 foreach ([
     'admin_bumdes' => ['Admin E2E', 'admin.e2e@example.test'],
     'admin_verifier' => ['Admin Verifier E2E', 'admin.verify.e2e@example.test'],
-    'pemilik_umkm' => ['Pemilik UMKM E2E', 'umkm.e2e@example.test'],
+    'penjual' => ['Penjual E2E', 'umkm.e2e@example.test'],
     'pelanggan' => ['Pelanggan E2E', 'pelanggan.e2e@example.test'],
     'kepala_bumdes' => ['Kepala BUMDes E2E', 'kepala.e2e@example.test'],
     'kurir' => ['Kurir E2E', 'kurir.e2e@example.test'],
@@ -42,9 +42,9 @@ foreach ([
     );
 }
 
-$store = UmkmStore::query()->where('user_id', $users['pemilik_umkm']->id)->first() ?? new UmkmStore();
+$store = UmkmStore::query()->where('user_id', $users['penjual']->id)->first() ?? new UmkmStore();
 $store->forceFill([
-    'user_id' => $users['pemilik_umkm']->id,
+    'user_id' => $users['penjual']->id,
     'name' => 'Toko E2E Buruan',
     'slug' => 'toko-e2e-buruan',
     'description' => 'Toko sintetis untuk browser E2E.',
@@ -99,13 +99,13 @@ $recipient = UmkmRecipientBankAccount::updateOrCreate(
     ['umkm_store_id' => $store->id, 'account_number' => '00123456789'],
     [
         'bank_name' => 'Bank E2E Penerima',
-        'account_holder_name' => $users['pemilik_umkm']->name,
+        'account_holder_name' => $users['penjual']->name,
         'status' => 'active',
         'active_store_lock' => 'store:'.$store->id,
         'verified_at' => now(),
         'verified_by' => $users['admin_bumdes']->id,
-        'created_by' => $users['pemilik_umkm']->id,
-        'updated_by' => $users['pemilik_umkm']->id,
+        'created_by' => $users['penjual']->id,
+        'updated_by' => $users['penjual']->id,
     ],
 );
 

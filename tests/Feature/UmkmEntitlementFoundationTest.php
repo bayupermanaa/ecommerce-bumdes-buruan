@@ -152,7 +152,7 @@ class UmkmEntitlementFoundationTest extends TestCase
     /** @return array{UmkmStore, Order, Payment, StoreOrder} */
     private function source(): array
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $customer = User::factory()->create(['role' => 'pelanggan']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Hak', 'slug' => 'toko-hak-'.Str::lower(Str::random(8)), 'status' => 'approved']);
         $order = Order::create([

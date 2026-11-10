@@ -132,7 +132,7 @@ class UmkmDisbursementRequestService
 
     private function ensureOwner(UmkmStore $store, User $owner): void
     {
-        if ($owner->role !== 'pemilik_umkm' || $store->user_id !== $owner->id) {
+        if (! \App\Support\UserRoles::isSeller($owner->role) || $store->user_id !== $owner->id) {
             throw new AuthorizationException('Hanya pemilik toko yang dapat mengajukan pencairan.');
         }
     }
@@ -140,7 +140,7 @@ class UmkmDisbursementRequestService
     private function toMinorUnits(?string $amount): int
     {
         if (! is_string($amount) || ! preg_match('/^(-?)(\d+)(?:\.(\d{1,2}))?$/', $amount, $matches)) {
-            throw ValidationException::withMessages(['entitlements' => 'Nominal hak UMKM tidak valid.']);
+            throw ValidationException::withMessages(['entitlements' => 'Nominal hak Penjual tidak valid.']);
         }
 
         return ((int) $matches[2] * 100 + (int) str_pad($matches[3] ?? '', 2, '0')) * ($matches[1] === '-' ? -1 : 1);

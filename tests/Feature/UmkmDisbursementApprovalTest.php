@@ -96,7 +96,7 @@ class UmkmDisbursementApprovalTest extends TestCase
     /** @return array{UmkmDisbursement, UmkmEntitlement, User, User} */
     private function requestedDisbursement(): array
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']); $admin = User::factory()->create(['role' => 'admin_bumdes']); $head = User::factory()->create(['role' => 'kepala_bumdes']);
+        $owner = User::factory()->create(['role' => 'penjual']); $admin = User::factory()->create(['role' => 'admin_bumdes']); $head = User::factory()->create(['role' => 'kepala_bumdes']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Uji', 'slug' => 'toko-'.Str::lower(Str::random(10)), 'status' => 'approved']);
         $account = $store->recipientBankAccounts()->create(['bank_name' => 'Bank Uji', 'account_holder_name' => $owner->name, 'account_number' => '00123456789', 'status' => 'active', 'active_store_lock' => 'store:'.$store->id, 'verified_at' => now(), 'created_by' => $owner->id, 'updated_by' => $owner->id]);
         $customer = User::factory()->create(['role' => 'pelanggan']);

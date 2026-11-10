@@ -13,7 +13,7 @@ class UmkmStoreManagementTest extends TestCase
 
     public function test_umkm_owner_can_create_and_update_their_store(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         $this->actingAs($owner)
             ->post(route('umkm.stores.store'), [
@@ -49,8 +49,8 @@ class UmkmStoreManagementTest extends TestCase
 
     public function test_umkm_owner_cannot_manage_another_owners_store(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
-        $otherOwner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
+        $otherOwner = User::factory()->create(['role' => 'penjual']);
         $otherStore = $otherOwner->umkmStore()->create([
             'name' => 'Toko Lain',
             'slug' => 'toko-lain',
@@ -70,7 +70,7 @@ class UmkmStoreManagementTest extends TestCase
 
     public function test_umkm_owner_can_only_create_one_store(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $owner->umkmStore()->create([
             'name' => 'Toko Pertama',
             'slug' => 'toko-pertama',

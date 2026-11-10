@@ -167,7 +167,7 @@ class CartTest extends TestCase
         int $stock = 5,
         int $price = 15000,
     ): Product {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => 'Toko '.fake()->unique()->word(),
             'slug' => 'toko-'.fake()->unique()->slug(),

@@ -43,7 +43,7 @@ class AdminFinancialAuditTest extends TestCase
         $this->get(route('admin.financial-audit.index'))->assertRedirect(route('login'));
         $this->get(route('admin.financial-audit.export'))->assertRedirect(route('login'));
 
-        foreach (['pelanggan', 'pemilik_umkm', 'kurir', 'kepala_bumdes'] as $role) {
+        foreach (['pelanggan', 'penjual', 'kurir', 'kepala_bumdes'] as $role) {
             $this->actingAs(User::factory()->create(['role' => $role]))
                 ->get(route('admin.financial-audit.index'))
                 ->assertForbidden();
@@ -106,7 +106,7 @@ class AdminFinancialAuditTest extends TestCase
             ->assertHeader('X-Audit-Results-Truncated', 'false')
             ->assertHeader('X-Audit-Result-Scope', 'bounded-not-global-total');
         $this->assertSame([
-            'Kode Exception', 'Prioritas', 'Reason', 'Tipe Referensi', 'ID Referensi', 'ID UMKM',
+            'Kode Exception', 'Prioritas', 'Reason', 'Tipe Referensi', 'ID Referensi', 'ID Penjual',
             'Status Aktual', 'Keterangan', 'Stable Exception Key', 'Waktu Sumber',
         ], $rows[0]);
         $this->assertCount(2, $rows);
@@ -233,7 +233,7 @@ class AdminFinancialAuditTest extends TestCase
 
     private function makeStore(string $name): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         return $owner->umkmStore()->create([
             'name' => $name,

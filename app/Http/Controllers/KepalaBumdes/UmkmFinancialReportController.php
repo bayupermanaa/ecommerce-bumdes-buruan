@@ -113,8 +113,8 @@ class UmkmFinancialReportController extends Controller
             ->cursor();
 
         return $this->streamCsv('laporan-hak-umkm', [
-            'Tanggal Terbentuk', 'Nama UMKM', 'Referensi StoreOrder', 'Nomor Pesanan', 'Status Entitlement',
-            'Nominal Hak UMKM', 'Tanggal Eligible', 'Tanggal Rekonsiliasi', 'Tanggal Settled',
+            'Tanggal Terbentuk', 'Nama Penjual', 'Referensi StoreOrder', 'Nomor Pesanan', 'Status Entitlement',
+            'Nominal Hak Penjual', 'Tanggal Eligible', 'Tanggal Rekonsiliasi', 'Tanggal Settled',
         ], $rows, function (UmkmEntitlement $row): array {
             return [
                 $this->safeCsvText($this->csvDate($row->accrued_at)),
@@ -244,7 +244,7 @@ class UmkmFinancialReportController extends Controller
             ->cursor();
 
         return $this->streamCsv('laporan-pencairan-umkm', [
-            'ID Pengajuan', 'Nama UMKM', 'Tanggal Pengajuan', 'Nominal Pengajuan', 'Status Pencairan',
+            'ID Pengajuan', 'Nama Penjual', 'Tanggal Pengajuan', 'Nominal Pengajuan', 'Status Pencairan',
             'Tanggal Review', 'Tanggal Persetujuan', 'Tanggal Transfer Dicatat', 'Tanggal Transfer Diverifikasi',
             'Tanggal Pencairan Berhasil', 'Tanggal Kegagalan Dikonfirmasi',
         ], $rows, function (UmkmDisbursement $row): array {

@@ -57,6 +57,6 @@ class UmkmEntitlementController extends Controller
             return back()->withErrors($exception->errors());
         }
 
-        return redirect()->route('admin.umkm-entitlements.show', $entitlement)->with('status', 'Hak UMKM berhasil direkonsiliasi.');
+        return redirect()->route('admin.umkm-entitlements.show', $entitlement)->with('status', 'Hak Penjual berhasil direkonsiliasi.');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\UserRoles;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,8 @@ class RoleMiddleware
 
         $userRole = $request->user()?->role;
 
-        if ($userRole === null || ! in_array($userRole, $roles, true)) {
+        if ($userRole === null || ! in_array($userRole, $roles, true)
+            && ! (in_array(UserRoles::SELLER, $roles, true) && UserRoles::isSeller($userRole))) {
             abort(403);
         }
 

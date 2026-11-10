@@ -71,7 +71,7 @@ class UmkmEntitlementService
 
             if ($lockedStoreOrder->fulfillment_status !== StoreOrderFulfillmentStatus::COMPLETED) {
                 throw ValidationException::withMessages([
-                    'fulfillment_status' => 'Hak UMKM hanya dapat menjadi eligible setelah pesanan toko selesai.',
+                    'fulfillment_status' => 'Hak Penjual hanya dapat menjadi eligible setelah pesanan toko selesai.',
                 ]);
             }
 
@@ -93,7 +93,7 @@ class UmkmEntitlementService
             }
 
             if ($entitlement->status !== UmkmEntitlementStatus::ACCRUED) {
-                throw ValidationException::withMessages(['entitlement' => 'Status hak UMKM tidak dapat menjadi eligible.']);
+                throw ValidationException::withMessages(['entitlement' => 'Status hak Penjual tidak dapat menjadi eligible.']);
             }
 
             $fromStatus = $entitlement->status;
@@ -131,7 +131,7 @@ class UmkmEntitlementService
 
             if ($lockedEntitlement->status !== UmkmEntitlementStatus::ELIGIBLE
                 || $storeOrder->fulfillment_status !== StoreOrderFulfillmentStatus::COMPLETED) {
-                throw ValidationException::withMessages(['entitlement' => 'Hak UMKM belum memenuhi syarat rekonsiliasi.']);
+                throw ValidationException::withMessages(['entitlement' => 'Hak Penjual belum memenuhi syarat rekonsiliasi.']);
             }
 
             $lockedEntitlement->forceFill([
@@ -159,7 +159,7 @@ class UmkmEntitlementService
             && $storeOrder->umkm_amount !== null
             && $storeOrder->commission_amount !== null;
         $status = $calculated ? UmkmEntitlementStatus::ACCRUED : UmkmEntitlementStatus::HELD;
-        $heldReason = $calculated ? null : 'Snapshot komisi pesanan toko belum calculated; nominal hak UMKM tidak dapat ditentukan.';
+        $heldReason = $calculated ? null : 'Snapshot komisi pesanan toko belum calculated; nominal hak Penjual tidak dapat ditentukan.';
 
         $entitlement = UmkmEntitlement::create([
             'umkm_store_id' => $storeOrder->umkm_store_id,
@@ -233,7 +233,7 @@ class UmkmEntitlementService
     private function ensureAdmin(User $actor): void
     {
         if ($actor->role !== 'admin_bumdes') {
-            throw new AuthorizationException('Hanya Admin BUMDes yang dapat merekonsiliasi hak UMKM.');
+            throw new AuthorizationException('Hanya Admin BUMDes yang dapat merekonsiliasi hak Penjual.');
         }
     }
 }

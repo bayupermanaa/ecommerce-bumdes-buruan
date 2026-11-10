@@ -49,8 +49,8 @@
                 <p class="mt-5 text-sm text-slate-400">{{ auth()->user()->name }} · Kepala BUMDes</p>
 
                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <div class="rounded-2xl border border-white/10 bg-white/10 p-4"><p class="text-sm text-slate-300">UMKM Terdaftar</p><p class="mt-1 text-2xl font-bold">{{ number_format($metrics['registered_stores']) }}</p></div>
-                        <div class="rounded-lg border border-gray-200 p-4"><p class="text-sm text-gray-500">UMKM Disetujui</p><p class="mt-1 text-2xl font-semibold">{{ number_format($metrics['approved_stores']) }}</p></div>
+                        <div class="rounded-2xl border border-white/10 bg-white/10 p-4"><p class="text-sm text-slate-300">Penjual Terdaftar</p><p class="mt-1 text-2xl font-bold">{{ number_format($metrics['registered_stores']) }}</p></div>
+                        <div class="rounded-lg border border-gray-200 p-4"><p class="text-sm text-gray-500">Penjual Disetujui</p><p class="mt-1 text-2xl font-semibold">{{ number_format($metrics['approved_stores']) }}</p></div>
                         <div class="rounded-lg border border-gray-200 p-4"><p class="text-sm text-gray-500">Produk Disetujui</p><p class="mt-1 text-2xl font-semibold">{{ number_format($metrics['approved_products']) }}</p></div>
                         <div class="rounded-lg border border-gray-200 p-4"><p class="text-sm text-gray-500">Seluruh Pesanan</p><p class="mt-1 text-2xl font-semibold">{{ number_format($metrics['total_orders']) }}</p></div>
                         <div class="rounded-lg border border-gray-200 p-4"><p class="text-sm text-gray-500">Pesanan Dalam Proses</p><p class="mt-1 text-2xl font-semibold">{{ number_format($metrics['in_fulfillment_orders']) }}</p></div>
@@ -65,10 +65,10 @@
                     <section class="rounded-lg border border-emerald-200 bg-emerald-50/50 p-5 space-y-4" aria-labelledby="monitoring-hak-umkm">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
-                                <h3 id="monitoring-hak-umkm" class="text-lg font-semibold text-gray-900">Monitoring Hak UMKM</h3>
+                                <h3 id="monitoring-hak-umkm" class="text-lg font-semibold text-gray-900">Monitoring Hak Penjual</h3>
                                 <p class="mt-1 text-sm text-gray-600">Status entitlement saat ini, bukan saldo historis pada tanggal tertentu.</p>
                             </div>
-                            <a href="{{ route('kepala-bumdes.umkm-financial.entitlements') }}" class="inline-flex items-center self-start rounded-md bg-emerald-700 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-emerald-600">Laporan Hak UMKM</a>
+                            <a href="{{ route('kepala-bumdes.umkm-financial.entitlements') }}" class="inline-flex items-center self-start rounded-md bg-emerald-700 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-emerald-600">Laporan Hak Penjual</a>
                         </div>
 
                         <div class="grid gap-3 sm:grid-cols-3">
@@ -95,10 +95,10 @@
                     <section class="rounded-lg border border-blue-200 bg-blue-50/50 p-5 space-y-4" aria-labelledby="monitoring-pencairan-umkm">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
-                                <h3 id="monitoring-pencairan-umkm" class="text-lg font-semibold text-gray-900">Monitoring Pencairan UMKM</h3>
+                                <h3 id="monitoring-pencairan-umkm" class="text-lg font-semibold text-gray-900">Monitoring Pencairan Penjual</h3>
                                 <p class="mt-1 text-sm text-gray-600">Pengelompokan mengikuti status saat ini; periode laporan lengkap berbasis cohort tanggal pengajuan.</p>
                             </div>
-                            <a href="{{ route('kepala-bumdes.umkm-financial.disbursements') }}" class="inline-flex items-center self-start rounded-md bg-blue-700 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-blue-600">Laporan Pencairan UMKM</a>
+                            <a href="{{ route('kepala-bumdes.umkm-financial.disbursements') }}" class="inline-flex items-center self-start rounded-md bg-blue-700 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-blue-600">Laporan Pencairan Penjual</a>
                         </div>
 
                         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -128,10 +128,10 @@
                             Laporan Transaksi
                         </a>
                         <a href="{{ route('kepala-bumdes.commission-report.index') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">Laporan Komisi</a>
-                        <a href="{{ route('kepala-bumdes.umkm-financial.entitlements') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">Laporan Hak UMKM</a>
-                        <a href="{{ route('kepala-bumdes.umkm-financial.disbursements') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">Laporan Pencairan UMKM</a>
+                        <a href="{{ route('kepala-bumdes.umkm-financial.entitlements') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">Laporan Hak Penjual</a>
+                        <a href="{{ route('kepala-bumdes.umkm-financial.disbursements') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">Laporan Pencairan Penjual</a>
                         <a href="{{ route('kepala-bumdes.stores.index') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">
-                            Laporan Per UMKM
+                            Laporan Per Penjual
                         </a>
                         <a href="{{ route('kepala-bumdes.disbursements.index') }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">
                             Persetujuan Pencairan

@@ -67,7 +67,7 @@ class StoreOrderFulfillmentServiceTest extends TestCase
     public function test_only_the_store_owner_can_view_or_manage_a_store_order(): void
     {
         [, $storeOrder, $owner] = $this->paidStoreOrder(StoreOrderFulfillmentStatus::AWAITING_PROCESSING);
-        $otherOwner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $otherOwner = User::factory()->create(['role' => 'penjual']);
         $otherOwner->umkmStore()->create(['name' => 'Toko Lain', 'slug' => 'toko-lain-'.Str::lower(Str::random(6))]);
 
         $this->assertTrue(Gate::forUser($owner)->allows('view', $storeOrder));
@@ -213,7 +213,7 @@ class StoreOrderFulfillmentServiceTest extends TestCase
      */
     private function paidStoreOrderForOrder(Order $order, string $status): array
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => 'Toko '.Str::upper(Str::random(6)),
             'slug' => 'toko-'.Str::lower(Str::random(12)),

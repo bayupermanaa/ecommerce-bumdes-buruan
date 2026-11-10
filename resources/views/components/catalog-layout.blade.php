@@ -23,9 +23,12 @@
                 <nav class="hidden items-center gap-2 text-sm font-semibold md:flex lg:gap-4" aria-label="Navigasi marketplace desktop">
                     <a href="{{ route('catalog.index') }}" class="inline text-slate-600 hover:text-emerald-700">Katalog</a>
                     @auth
-                        @if (auth()->user()->role === 'pelanggan')
+                        @if (\App\Support\UserRoles::canBuy(auth()->user()->role))
                             <a href="{{ route('cart.index') }}" class="rounded-xl px-2.5 py-2 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Keranjang</a>
                             <a href="{{ route('orders.index') }}" class="rounded-xl px-2.5 py-2 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Pesanan</a>
+                        @endif
+                        @if (auth()->user()->role === 'pelanggan')
+                            <a href="{{ route('seller-application.show') }}" class="rounded-xl px-2.5 py-2 text-emerald-700 hover:bg-emerald-50">Mulai Berjualan</a>
                         @endif
                         <a href="{{ route('dashboard') }}" class="rounded-xl bg-slate-950 px-3 py-2 text-white hover:bg-slate-800">Dashboard</a>
                         <form method="POST" action="{{ route('logout') }}" data-testid="customer-logout-desktop">
@@ -33,7 +36,9 @@
                             <button type="submit" class="rounded-xl border border-slate-300 px-3 py-2 text-slate-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700">Keluar</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="rounded-xl bg-slate-950 px-3 py-2 text-white hover:bg-slate-800">Masuk</a>
+                        <a href="{{ route('register', ['intent' => 'seller']) }}" class="rounded-xl px-2.5 py-2 text-emerald-700 hover:bg-emerald-50">Mulai Berjualan</a>
+                        <a href="{{ route('login') }}" class="rounded-xl border border-slate-300 px-3 py-2 text-slate-700 hover:bg-slate-50">Masuk</a>
+                        <a href="{{ route('register') }}" class="rounded-xl bg-slate-950 px-3 py-2 text-white hover:bg-slate-800">Daftar</a>
                     @endauth
                 </nav>
 
@@ -47,9 +52,12 @@
                 <div class="mx-auto grid max-w-7xl gap-2 text-sm font-semibold">
                     <a href="{{ route('catalog.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Katalog</a>
                     @auth
-                        @if (auth()->user()->role === 'pelanggan')
+                        @if (\App\Support\UserRoles::canBuy(auth()->user()->role))
                             <a href="{{ route('cart.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Keranjang</a>
                             <a href="{{ route('orders.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Pesanan</a>
+                        @endif
+                        @if (auth()->user()->role === 'pelanggan')
+                            <a href="{{ route('seller-application.show') }}" class="rounded-xl px-3 py-2.5 text-emerald-700 hover:bg-emerald-50">Mulai Berjualan</a>
                         @endif
                         <a href="{{ route('dashboard') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-100">Dashboard</a>
                         <form method="POST" action="{{ route('logout') }}" data-testid="customer-logout-mobile">
@@ -57,7 +65,9 @@
                             <button type="submit" class="w-full rounded-xl border border-red-200 px-3 py-2.5 text-left text-red-700 hover:bg-red-50">Keluar</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="rounded-xl bg-slate-950 px-3 py-2.5 text-center text-white hover:bg-slate-800">Masuk</a>
+                        <a href="{{ route('register', ['intent' => 'seller']) }}" class="rounded-xl px-3 py-2.5 text-center font-bold text-emerald-700 hover:bg-emerald-50">Mulai Berjualan</a>
+                        <a href="{{ route('login') }}" class="rounded-xl border border-slate-300 px-3 py-2.5 text-center text-slate-700 hover:bg-slate-50">Masuk</a>
+                        <a href="{{ route('register') }}" class="rounded-xl bg-slate-950 px-3 py-2.5 text-center text-white hover:bg-slate-800">Daftar</a>
                     @endauth
                 </div>
             </nav>

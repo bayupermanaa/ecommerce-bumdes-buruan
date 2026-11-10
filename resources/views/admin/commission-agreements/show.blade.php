@@ -11,7 +11,7 @@
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div><p class="text-sm text-gray-500">Toko UMKM</p><h3 class="mt-1 text-xl font-semibold text-gray-900">{{ $agreement->umkmStore->name }}</h3></div>
+                    <div><p class="text-sm text-gray-500">Toko Penjual</p><h3 class="mt-1 text-xl font-semibold text-gray-900">{{ $agreement->umkmStore->name }}</h3></div>
                     <span class="rounded-full px-3 py-1 text-sm font-semibold {{ $agreement->status === 'active' ? 'bg-green-100 text-green-800' : (($agreement->status === 'ended' || $agreement->status === 'cancelled') ? 'bg-gray-200 text-gray-700' : 'bg-amber-100 text-amber-800') }}">{{ $agreement->statusLabel() }}</span>
                 </div>
                 <dl class="mt-6 grid gap-5 text-sm sm:grid-cols-2">

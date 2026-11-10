@@ -132,7 +132,7 @@ class ProductRevisionTest extends TestCase
     public function test_other_owner_cannot_create_a_revision_for_another_stores_product(): void
     {
         [, $product] = $this->approvedProduct('other-owner');
-        $otherOwner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $otherOwner = User::factory()->create(['role' => 'penjual']);
         $otherOwner->umkmStore()->create(['name' => 'Toko Pemilik Lain', 'slug' => 'toko-pemilik-lain-revision']);
 
         $this->actingAs($otherOwner)
@@ -166,7 +166,7 @@ class ProductRevisionTest extends TestCase
      */
     private function approvedProduct(string $suffix = 'default'): array
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => "Toko {$suffix}",
             'slug' => "toko-{$suffix}",

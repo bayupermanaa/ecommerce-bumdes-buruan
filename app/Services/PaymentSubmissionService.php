@@ -117,7 +117,8 @@ class PaymentSubmissionService
 
     private function ensureCustomerOwnsOrder(Order $order, User $customer): void
     {
-        if ($customer->role !== 'pelanggan' || $order->user_id !== $customer->id) {
+        if (! \App\Support\UserRoles::canBuy($customer->role)
+            || $order->user_id !== $customer->id) {
             throw new AuthorizationException('Anda tidak berwenang mengajukan pembayaran untuk pesanan ini.');
         }
     }

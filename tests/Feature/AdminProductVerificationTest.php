@@ -132,7 +132,7 @@ class AdminProductVerificationTest extends TestCase
 
     public function test_non_admin_cannot_verify_products(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => 'Toko Pemilik Produk',
             'slug' => 'toko-pemilik-produk-admin',
@@ -164,7 +164,7 @@ class AdminProductVerificationTest extends TestCase
 
     private function createProduct(string $name, string $suffix, Category $category, string $status = 'pending'): Product
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => "Toko {$suffix}",
             'slug' => "toko-{$suffix}",

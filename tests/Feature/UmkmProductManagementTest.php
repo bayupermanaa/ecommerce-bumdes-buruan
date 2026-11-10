@@ -14,7 +14,7 @@ class UmkmProductManagementTest extends TestCase
 
     public function test_approved_store_owner_can_create_a_pending_product(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => 'Toko Disetujui',
             'slug' => 'toko-disetujui',
@@ -44,7 +44,7 @@ class UmkmProductManagementTest extends TestCase
 
     public function test_pending_store_owner_cannot_create_products(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $owner->umkmStore()->create([
             'name' => 'Toko Menunggu',
             'slug' => 'toko-menunggu',
@@ -57,8 +57,8 @@ class UmkmProductManagementTest extends TestCase
 
     public function test_owner_cannot_manage_products_from_another_store(): void
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
-        $otherOwner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
+        $otherOwner = User::factory()->create(['role' => 'penjual']);
         $otherStore = $otherOwner->umkmStore()->create([
             'name' => 'Toko Lain',
             'slug' => 'toko-lain-produk',

@@ -15,7 +15,7 @@
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                     <p class="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Pesanan Berhasil Dibuat</p>
                     <h1 class="mt-2 text-2xl font-bold text-gray-900">{{ $order->order_number }}</h1>
-                    <p class="mt-2 text-sm text-gray-600">Dibuat {{ $order->created_at->format('d-m-Y H:i') }} | Metode: Ambil di Toko UMKM</p>
+                    <p class="mt-2 text-sm text-gray-600">Dibuat {{ $order->created_at->format('d-m-Y H:i') }} | Metode: Ambil di Toko Penjual</p>
                     <p class="mt-2 text-sm font-medium {{ $order->order_status === 'cancelled' ? 'text-red-700' : ($order->order_status === 'completed' ? 'text-green-700' : 'text-amber-700') }}">Status pesanan: {{ $order->orderStatusLabel() }}</p>
                     @if ($order->cancelled_at)
                         <p class="mt-1 text-sm text-gray-600">Dibatalkan pada {{ $order->cancelled_at->format('d-m-Y H:i') }}.</p>

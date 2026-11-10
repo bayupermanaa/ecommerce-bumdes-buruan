@@ -49,7 +49,7 @@ class PaymentConfirmationServiceTest extends TestCase
     {
         $payment = $this->cashPayment($this->order());
 
-        foreach (['pelanggan', 'pemilik_umkm', 'kurir', 'kepala_bumdes'] as $role) {
+        foreach (['pelanggan', 'penjual', 'kurir', 'kepala_bumdes'] as $role) {
             $user = User::factory()->create(['role' => $role]);
 
             $this->assertFalse(Gate::forUser($user)->allows('confirm', $payment));
@@ -257,7 +257,7 @@ class PaymentConfirmationServiceTest extends TestCase
 
     private function storeOrder(Order $order): StoreOrder
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => 'Toko Snapshot',
             'slug' => fake()->unique()->slug(),

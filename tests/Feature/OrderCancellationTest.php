@@ -168,7 +168,7 @@ class OrderCancellationTest extends TestCase
 
     private function availableProduct(string $name, int $stock, string $storeName): Product
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => $storeName,
             'slug' => fake()->unique()->slug(),

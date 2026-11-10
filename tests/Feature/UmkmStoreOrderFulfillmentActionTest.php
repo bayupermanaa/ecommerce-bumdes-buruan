@@ -153,7 +153,7 @@ class UmkmStoreOrderFulfillmentActionTest extends TestCase
 
     private function owner(string $name): User
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $owner->umkmStore()->create(['name' => $name, 'slug' => 'toko-'.Str::lower(Str::random(12))]);
 
         return $owner;

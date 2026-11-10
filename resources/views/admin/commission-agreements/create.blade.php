@@ -3,7 +3,7 @@
     <div>
         <div class="mx-auto max-w-2xl sm:px-6 lg:px-8">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p class="text-sm text-gray-600">Toko UMKM</p>
+                <p class="text-sm text-gray-600">Toko Penjual</p>
                 <p class="mt-1 font-semibold text-gray-900">{{ $store->name }}</p>
                 <form method="POST" action="{{ route('admin.commission-agreements.store') }}" class="mt-6 space-y-5" onsubmit="if (this.dataset.submitting === 'true') return false; this.dataset.submitting = 'true'; const button = this.querySelector('[data-save-agreement]'); if (button) { button.disabled = true; button.setAttribute('aria-disabled', 'true'); button.textContent = 'Menyimpan...'; } return true;">
                     @csrf

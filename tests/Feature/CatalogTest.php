@@ -24,6 +24,7 @@ class CatalogTest extends TestCase
             ->assertSee('data-testid="customer-logout-desktop"', false)
             ->assertSee('data-testid="customer-logout-mobile"', false)
             ->assertSee('action="'.route('logout').'"', false)
+            ->assertSeeText('Mulai Berjualan')
             ->assertSeeText('Keluar');
 
         $this->post(route('logout'));
@@ -32,7 +33,10 @@ class CatalogTest extends TestCase
             ->assertOk()
             ->assertDontSee('data-testid="customer-logout-desktop"', false)
             ->assertDontSee('data-testid="customer-logout-mobile"', false)
-            ->assertDontSeeText('Keluar');
+            ->assertDontSeeText('Keluar')
+            ->assertSeeText('Masuk')
+            ->assertSeeText('Daftar')
+            ->assertSeeText('Mulai Berjualan');
     }
 
     public function test_homepage_redirects_to_the_public_catalog(): void
@@ -105,7 +109,7 @@ class CatalogTest extends TestCase
     public function test_owner_can_upload_a_valid_product_photo(): void
     {
         Storage::fake('public');
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Foto', 'slug' => 'toko-foto']);
         $store->forceFill(['status' => 'approved'])->save();
         $category = Category::create(['name' => 'Fashion', 'slug' => 'fashion-photo']);
@@ -132,7 +136,7 @@ class CatalogTest extends TestCase
     public function test_invalid_product_photo_is_rejected(): void
     {
         Storage::fake('public');
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => 'Toko File', 'slug' => 'toko-file']);
         $store->forceFill(['status' => 'approved'])->save();
         $category = Category::create(['name' => 'Pertanian', 'slug' => 'pertanian-photo']);
@@ -156,7 +160,7 @@ class CatalogTest extends TestCase
         Storage::fake('public');
         $category = Category::create(['name' => 'Kerajinan', 'slug' => 'kerajinan-photo-access']);
         $product = $this->createProduct('Produk Toko Lain', 'other-photo', $category, 'approved', 'approved');
-        $otherOwner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $otherOwner = User::factory()->create(['role' => 'penjual']);
         $otherStore = $otherOwner->umkmStore()->create(['name' => 'Toko Lain', 'slug' => 'toko-lain-photo']);
         $otherStore->forceFill(['status' => 'approved'])->save();
 
@@ -175,7 +179,7 @@ class CatalogTest extends TestCase
 
     private function createProduct(string $name, string $suffix, Category $category, string $storeStatus, string $productStatus): Product
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => "Toko {$suffix}",
             'slug' => "toko-{$suffix}",

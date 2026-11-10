@@ -32,7 +32,7 @@ class UmkmStoreController extends Controller
     }
 
     /**
-     * Store a new UMKM profile for the authenticated owner.
+     * Store a new Penjual profile for the authenticated owner.
      */
     public function store(Request $request): RedirectResponse
     {

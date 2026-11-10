@@ -59,10 +59,10 @@ class ProductController extends Controller
         $imagePath = $image?->store('products', 'public');
 
         try {
-            $request->user()->umkmStore->products()->create([
-                ...$data,
-                'image_path' => $imagePath,
-            ]);
+            DB::transaction(function () use ($request, $data, $imagePath): void {
+                $product = $request->user()->umkmStore->products()->create([...$data, 'image_path' => $imagePath]);
+                $this->syncVariants($product, $request);
+            });
         } catch (Throwable $exception) {
             if ($imagePath !== null) {
                 Storage::disk('public')->delete($imagePath);
@@ -83,7 +83,7 @@ class ProductController extends Controller
     {
         Gate::authorize('update', $product);
 
-        $product->load('pendingRevision');
+        $product->load(['pendingRevision', 'variants']);
 
         return view('umkm.products.edit', [
             'product' => $product,
@@ -114,10 +114,10 @@ class ProductController extends Controller
         $oldImagePath = $product->image_path;
 
         try {
-            $product->update([
-                ...$data,
-                ...($newImagePath !== null ? ['image_path' => $newImagePath] : []),
-            ]);
+            DB::transaction(function () use ($product, $data, $newImagePath, $request): void {
+                $product->update([...$data, ...($newImagePath !== null ? ['image_path' => $newImagePath] : [])]);
+                $this->syncVariants($product, $request);
+            });
         } catch (Throwable $exception) {
             if ($newImagePath !== null) {
                 Storage::disk('public')->delete($newImagePath);
@@ -256,7 +256,7 @@ class ProductController extends Controller
             }
         });
 
-        return $request->validate([
+        $data = $request->validate([
             'category_id' => ['required', 'integer', $categoryRule],
             'sku' => ['required', 'string', 'max:255', Rule::unique('products', 'sku')->ignore($product)],
             'name' => ['required', 'string', 'max:255'],
@@ -265,6 +265,40 @@ class ProductController extends Controller
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
+            'pricing_type' => ['nullable', Rule::in(['single', 'variants'])],
+            'variants' => ['nullable', 'array'],
+            'variants.*.label' => ['required', 'string', 'max:255'],
+            'variants.*.sku' => ['required', 'string', 'max:255'],
+            'variants.*.price' => ['required', 'numeric', 'min:0'],
+            'variants.*.stock' => ['required', 'integer', 'min:0'],
         ]);
+
+        $data['pricing_type'] = $data['pricing_type'] ?? 'single';
+        if ($data['pricing_type'] === 'variants' && count($data['variants'] ?? []) === 0) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['variants' => 'Tambahkan minimal satu variasi ukuran.']);
+        }
+        $variants = collect($data['variants'] ?? []);
+        if ($variants->pluck('label')->map(fn ($v) => mb_strtolower(trim($v)))->duplicates()->isNotEmpty()) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['variants' => 'Label variasi tidak boleh duplikat.']);
+        }
+        if ($variants->pluck('sku')->map(fn ($v) => mb_strtolower(trim($v)))->duplicates()->isNotEmpty()) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['variants' => 'SKU variasi tidak boleh duplikat.']);
+        }
+        $data['variants'] = $data['pricing_type'] === 'variants' ? $data['variants'] : [];
+        return $data;
+    }
+
+    private function syncVariants(Product $product, Request $request): void
+    {
+        if ($product->status === 'approved') {
+            return;
+        }
+        if ($product->variants()->exists() && ($product->cartItems()->exists() || $product->orderItems()->exists())) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['variants' => 'Variasi yang sudah digunakan transaksi tidak dapat diganti langsung.']);
+        }
+        $product->variants()->delete();
+        foreach (($request->input('pricing_type') === 'variants' ? $request->input('variants', []) : []) as $variant) {
+            $product->variants()->create(['label' => trim($variant['label']), 'sku' => trim($variant['sku']), 'price' => $variant['price'], 'stock' => $variant['stock'], 'is_active' => true]);
+        }
     }
 }

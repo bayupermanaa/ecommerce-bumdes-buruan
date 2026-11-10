@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\CommissionAgreement;
 use App\Models\User;
+use App\Support\UserRoles;
 
 class CommissionAgreementPolicy
 {
@@ -29,7 +30,7 @@ class CommissionAgreementPolicy
     public function view(User $user, CommissionAgreement $agreement): bool
     {
         return $user->role === 'admin_bumdes'
-            || ($user->role === 'pemilik_umkm' && $agreement->umkmStore->user_id === $user->id);
+            || (UserRoles::isSeller($user->role) && $agreement->umkmStore->user_id === $user->id);
     }
 
     /**

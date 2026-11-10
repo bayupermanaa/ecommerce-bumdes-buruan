@@ -33,7 +33,7 @@ class KepalaBumdesUmkmFinancialReportTest extends TestCase
         $entitlements = $this->actingAs($head)->get(route(self::ENTITLEMENT_ROUTE));
         $entitlements->assertOk()
             ->assertViewIs('kepala-bumdes.reports.umkm-financial.entitlements')
-            ->assertSee('Laporan Hak Pendapatan UMKM');
+            ->assertSee('Laporan Hak Pendapatan Penjual');
         foreach (['summary', 'statusSummary', 'byStore', 'details', 'filters', 'storeOptions'] as $variable) {
             $entitlements->assertViewHas($variable);
         }
@@ -41,7 +41,7 @@ class KepalaBumdesUmkmFinancialReportTest extends TestCase
         $disbursements = $this->actingAs($head)->get(route(self::DISBURSEMENT_ROUTE));
         $disbursements->assertOk()
             ->assertViewIs('kepala-bumdes.reports.umkm-financial.disbursements')
-            ->assertSee('Laporan Pencairan UMKM');
+            ->assertSee('Laporan Pencairan Penjual');
         foreach (['summary', 'statusSummary', 'byStore', 'details', 'filters', 'storeOptions'] as $variable) {
             $disbursements->assertViewHas($variable);
         }
@@ -57,7 +57,7 @@ class KepalaBumdesUmkmFinancialReportTest extends TestCase
 
     public function test_non_head_roles_are_forbidden_from_both_financial_reports(): void
     {
-        foreach (['pelanggan', 'pemilik_umkm', 'admin_bumdes', 'kurir'] as $role) {
+        foreach (['pelanggan', 'penjual', 'admin_bumdes', 'kurir'] as $role) {
             $user = User::factory()->create(['role' => $role]);
 
             $this->actingAs($user)->get(route(self::ENTITLEMENT_ROUTE))->assertForbidden();
@@ -99,8 +99,8 @@ class KepalaBumdesUmkmFinancialReportTest extends TestCase
 
         $response->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
         $this->assertSame([
-            'Tanggal Terbentuk', 'Nama UMKM', 'Referensi StoreOrder', 'Nomor Pesanan', 'Status Entitlement',
-            'Nominal Hak UMKM', 'Tanggal Eligible', 'Tanggal Rekonsiliasi', 'Tanggal Settled',
+            'Tanggal Terbentuk', 'Nama Penjual', 'Referensi StoreOrder', 'Nomor Pesanan', 'Status Entitlement',
+            'Nominal Hak Penjual', 'Tanggal Eligible', 'Tanggal Rekonsiliasi', 'Tanggal Settled',
         ], $rows[0]);
         $this->assertCount(8, $rows);
         $byStatus = collect(array_slice($rows, 1))->keyBy(4);
@@ -164,7 +164,7 @@ class KepalaBumdesUmkmFinancialReportTest extends TestCase
 
         $response->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
         $this->assertSame([
-            'ID Pengajuan', 'Nama UMKM', 'Tanggal Pengajuan', 'Nominal Pengajuan', 'Status Pencairan',
+            'ID Pengajuan', 'Nama Penjual', 'Tanggal Pengajuan', 'Nominal Pengajuan', 'Status Pencairan',
             'Tanggal Review', 'Tanggal Persetujuan', 'Tanggal Transfer Dicatat', 'Tanggal Transfer Diverifikasi',
             'Tanggal Pencairan Berhasil', 'Tanggal Kegagalan Dikonfirmasi',
         ], $rows[0]);
@@ -624,7 +624,7 @@ class KepalaBumdesUmkmFinancialReportTest extends TestCase
 
     private function makeStore(?string $name = null): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         return $owner->umkmStore()->create([
             'name' => $name ?? 'Toko Laporan Test',

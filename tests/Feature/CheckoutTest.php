@@ -92,7 +92,7 @@ class CheckoutTest extends TestCase
             ->assertOk()
             ->assertSee([
                 'Diantar Kurir BUMDes',
-                'Ambil di Toko UMKM',
+                'Ambil di Toko Penjual',
                 'Blahbatuh',
                 'Payangan',
                 'Jalan Buruan No. 1',
@@ -165,7 +165,7 @@ class CheckoutTest extends TestCase
         string $productStatus = 'approved',
         string $storeStatus = 'approved',
     ): Product {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create([
             'name' => $storeName,
             'slug' => fake()->unique()->slug(),

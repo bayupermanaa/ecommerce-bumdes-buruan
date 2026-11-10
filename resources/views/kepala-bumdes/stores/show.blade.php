@@ -1,11 +1,11 @@
-<x-kepala-bumdes-layout title="Detail Laporan UMKM">
+<x-kepala-bumdes-layout title="Detail Laporan Penjual">
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Rincian Laporan UMKM</h2>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Rincian Laporan Penjual</h2>
                 <p class="mt-1 text-sm text-gray-600">{{ $store->name }}</p>
             </div>
-            <a href="{{ route('kepala-bumdes.stores.index', array_filter(['date_from' => $filters['date_from'], 'date_to' => $filters['date_to'], 'fulfillment_status' => $filters['fulfillment_status']])) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Kembali ke Laporan Per UMKM</a>
+            <a href="{{ route('kepala-bumdes.stores.index', array_filter(['date_from' => $filters['date_from'], 'date_to' => $filters['date_to'], 'fulfillment_status' => $filters['fulfillment_status']])) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Kembali ke Laporan Per Penjual</a>
         </div>
     </x-slot>
 
@@ -14,7 +14,7 @@
             <div class="bg-white p-6 shadow-sm sm:rounded-lg">
                 <p class="font-medium text-gray-900">{{ $store->name }}</p>
                 @if ($store->address)<p class="mt-1 text-sm text-gray-600">{{ $store->address }}</p>@endif
-                <p class="mt-2 text-xs text-gray-500">Rincian memakai snapshot nilai toko. Pesanan belum paid ditampilkan untuk monitoring, tetapi tidak termasuk penjualan terkonfirmasi, komisi snapshot, atau estimasi hak UMKM.</p>
+                <p class="mt-2 text-xs text-gray-500">Rincian memakai snapshot nilai toko. Pesanan belum paid ditampilkan untuk monitoring, tetapi tidak termasuk penjualan terkonfirmasi, komisi snapshot, atau estimasi hak Penjual.</p>
             </div>
 
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -27,7 +27,7 @@
                                 <th class="px-6 py-3">Fulfillment</th>
                                 <th class="px-6 py-3 text-right">Nilai Toko</th>
                                 <th class="px-6 py-3 text-right">Komisi Snapshot</th>
-                                <th class="px-6 py-3 text-right">Estimasi Hak UMKM</th>
+                                <th class="px-6 py-3 text-right">Estimasi Hak Penjual</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 text-gray-700">

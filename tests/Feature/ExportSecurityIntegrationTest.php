@@ -90,7 +90,7 @@ class ExportSecurityIntegrationTest extends TestCase
             $this->assertNotNull($route);
             $this->assertSame(['GET', 'HEAD'], $route->methods());
 
-            foreach (['pelanggan', 'pemilik_umkm', 'admin_bumdes', 'kurir', 'kepala_bumdes'] as $role) {
+            foreach (['pelanggan', 'penjual', 'admin_bumdes', 'kurir', 'kepala_bumdes'] as $role) {
                 if ($role === $allowedRole) {
                     continue;
                 }
@@ -104,7 +104,7 @@ class ExportSecurityIntegrationTest extends TestCase
 
     private function makeStore(string $name): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         return $owner->umkmStore()->create([
             'name' => $name,

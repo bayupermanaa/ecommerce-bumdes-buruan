@@ -65,7 +65,7 @@ class FinancialAuditController extends Controller
             $output = fopen('php://output', 'wb');
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, [
-                'Kode Exception', 'Prioritas', 'Reason', 'Tipe Referensi', 'ID Referensi', 'ID UMKM',
+                'Kode Exception', 'Prioritas', 'Reason', 'Tipe Referensi', 'ID Referensi', 'ID Penjual',
                 'Status Aktual', 'Keterangan', 'Stable Exception Key', 'Waktu Sumber',
             ]);
 

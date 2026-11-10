@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -19,9 +21,15 @@ class CartController extends Controller
      */
     public function index(Request $request): View
     {
+        $variantReady = Schema::hasColumn('cart_items', 'variant_identity');
+        $relations = ['items.product.category', 'items.product.umkmStore'];
+        if ($variantReady) {
+            $relations[] = 'items.variant';
+            $relations['items.product'] = fn ($query) => $query->withExists('variants');
+        }
         $cart = Cart::query()
             ->where('user_id', $request->user()->id)
-            ->with(['items.product.category', 'items.product.umkmStore'])
+            ->with($relations)
             ->first();
 
         return view('cart.index', compact('cart'));
@@ -32,26 +40,37 @@ class CartController extends Controller
      */
     public function store(Request $request, Product $product): RedirectResponse
     {
-        $quantity = $request->validate([
+        $validated = $request->validate([
             'quantity' => ['required', 'integer', 'min:1'],
-        ])['quantity'];
+            'product_variant_id' => ['nullable', 'integer'],
+        ]);
+        $quantity = $validated['quantity'];
+        $variantId = $validated['product_variant_id'] ?? null;
+        $variantReady = Schema::hasColumn('cart_items', 'variant_identity');
+        if (! $variantReady && $variantId !== null) {
+            throw ValidationException::withMessages(['product_variant_id' => 'Variasi produk belum tersedia.']);
+        }
 
-        DB::transaction(function () use ($request, $product, $quantity): void {
+        DB::transaction(function () use ($request, $product, $quantity, $variantId, $variantReady): void {
+            $cart = $this->cartForUser($request->user()->id);
+            Cart::query()->whereKey($cart->id)->lockForUpdate()->firstOrFail();
             $product = Product::query()
                 ->with('umkmStore')
                 ->lockForUpdate()
                 ->findOrFail($product->id);
-            $this->ensureProductCanBeAdded($product);
+            $variant = $variantReady ? $this->resolveVariant($product, $variantId) : null;
+            $this->ensureProductCanBeAdded($product, $variant);
 
-            $cart = $this->cartForUser($request->user()->id);
-            $item = CartItem::query()
+            $itemQuery = CartItem::query()
                 ->where('cart_id', $cart->id)
-                ->where('product_id', $product->id)
-                ->lockForUpdate()
-                ->first();
+                ->where('product_id', $product->id);
+            if ($variantReady) {
+                $itemQuery->where('variant_identity', $variant?->id ?? 0);
+            }
+            $item = $itemQuery->lockForUpdate()->first();
             $newQuantity = ($item?->quantity ?? 0) + $quantity;
 
-            $this->ensureQuantityWithinStock($newQuantity, $product);
+            $this->ensureQuantityWithinStock($newQuantity, $variant ?? $product);
 
             if ($item) {
                 $item->update(['quantity' => $newQuantity]);
@@ -61,6 +80,7 @@ class CartController extends Controller
 
             $cart->items()->create([
                 'product_id' => $product->id,
+                ...($variantReady ? ['product_variant_id' => $variant?->id, 'variant_identity' => $variant?->id ?? 0] : []),
                 'quantity' => $quantity,
             ]);
         });
@@ -81,13 +101,17 @@ class CartController extends Controller
         $this->ensureItemBelongsToUser($request, $item);
 
         DB::transaction(function () use ($item, $quantity): void {
+            Cart::query()->whereKey($item->cart_id)->lockForUpdate()->firstOrFail();
             $item = CartItem::query()->lockForUpdate()->findOrFail($item->id);
             $product = Product::query()
                 ->with('umkmStore')
                 ->lockForUpdate()
                 ->findOrFail($item->product_id);
-            $this->ensureProductCanBeAdded($product);
-            $this->ensureQuantityWithinStock($quantity, $product);
+            $variant = Schema::hasColumn('cart_items', 'variant_identity')
+                ? $this->resolveVariant($product, $item->product_variant_id)
+                : null;
+            $this->ensureProductCanBeAdded($product, $variant);
+            $this->ensureQuantityWithinStock($quantity, $variant ?? $product);
 
             $item->update(['quantity' => $quantity]);
         });
@@ -140,7 +164,25 @@ class CartController extends Controller
     /**
      * Reject products that are no longer publicly purchasable.
      */
-    private function ensureProductCanBeAdded(Product $product): void
+    private function resolveVariant(Product $product, ?int $variantId): ?ProductVariant
+    {
+        if ($variantId === null) {
+            if ($product->variants()->exists()) {
+                throw ValidationException::withMessages(['product_variant_id' => 'Pilih variasi produk sebelum menambahkannya ke keranjang.']);
+            }
+
+            return null;
+        }
+
+        $variant = $product->variants()->lockForUpdate()->find($variantId);
+        if (! $variant || ! $variant->is_active) {
+            throw ValidationException::withMessages(['product_variant_id' => 'Variasi produk tidak tersedia.']);
+        }
+
+        return $variant;
+    }
+
+    private function ensureProductCanBeAdded(Product $product, ?ProductVariant $variant): void
     {
         if ($product->status !== 'approved' || $product->umkmStore?->status !== 'approved') {
             throw ValidationException::withMessages([
@@ -148,7 +190,7 @@ class CartController extends Controller
             ]);
         }
 
-        if ($product->stock < 1) {
+        if (($variant ?? $product)->stock < 1) {
             throw ValidationException::withMessages([
                 'quantity' => 'Produk ini sedang kehabisan stok.',
             ]);
@@ -158,11 +200,11 @@ class CartController extends Controller
     /**
      * Keep each cart quantity within current stock without reserving stock.
      */
-    private function ensureQuantityWithinStock(int $quantity, Product $product): void
+    private function ensureQuantityWithinStock(int $quantity, Product|ProductVariant $stockSource): void
     {
-        if ($quantity > $product->stock) {
+        if ($quantity > $stockSource->stock) {
             throw ValidationException::withMessages([
-                'quantity' => "Jumlah produk tidak boleh melebihi stok tersedia ({$product->stock}).",
+                'quantity' => "Jumlah produk tidak boleh melebihi stok tersedia ({$stockSource->stock}).",
             ]);
         }
     }

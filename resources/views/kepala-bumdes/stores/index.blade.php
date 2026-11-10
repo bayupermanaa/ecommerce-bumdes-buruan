@@ -1,7 +1,7 @@
-<x-kepala-bumdes-layout title="Laporan Per UMKM">
+<x-kepala-bumdes-layout title="Laporan Per Penjual">
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Laporan Per UMKM</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Laporan Per Penjual</h2>
             <a href="{{ route('kepala-bumdes.dashboard') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Kembali ke Dashboard</a>
         </div>
     </x-slot>
@@ -19,9 +19,9 @@
                         <x-text-input id="date_to" name="date_to" type="date" class="mt-1 block w-full" :value="$filters['date_to']" />
                     </div>
                     <div>
-                        <x-input-label for="store_id" value="UMKM" />
+                        <x-input-label for="store_id" value="Penjual" />
                         <select id="store_id" name="store_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="">Semua UMKM</option>
+                            <option value="">Semua Penjual</option>
                             @foreach ($storeOptions as $option)
                                 <option value="{{ $option->id }}" @selected((string) ($filters['store_id'] ?? '') === (string) $option->id)>{{ $option->name }}</option>
                             @endforeach
@@ -54,12 +54,12 @@
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500">
                             <tr>
-                                <th class="px-6 py-3">UMKM</th>
+                                <th class="px-6 py-3">Penjual</th>
                                 <th class="px-6 py-3 text-right">Pesanan Toko</th>
                                 <th class="px-6 py-3 text-right">Paid / Selesai</th>
                                 <th class="px-6 py-3 text-right">Penjualan Terkonfirmasi</th>
                                 <th class="px-6 py-3 text-right">Komisi Snapshot</th>
-                                <th class="px-6 py-3 text-right">Estimasi Hak UMKM</th>
+                                <th class="px-6 py-3 text-right">Estimasi Hak Penjual</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 text-gray-700">
@@ -78,7 +78,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Tidak ada UMKM sesuai filter.</td></tr>
+                                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Tidak ada Penjual sesuai filter.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

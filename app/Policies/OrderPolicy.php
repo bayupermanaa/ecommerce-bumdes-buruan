@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Support\UserRoles;
 
 class OrderPolicy
 {
@@ -12,7 +13,7 @@ class OrderPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'pelanggan';
+        return UserRoles::canBuy($user->role);
     }
 
     /**
@@ -20,7 +21,8 @@ class OrderPolicy
      */
     public function view(User $user, Order $order): bool
     {
-        return $user->role === 'pelanggan' && $order->user_id === $user->id;
+        return UserRoles::canBuy($user->role)
+            && $order->user_id === $user->id;
     }
 
     /**

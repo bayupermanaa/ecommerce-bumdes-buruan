@@ -21,8 +21,8 @@ class KepalaBumdesStoreReportTest extends TestCase
     public function test_kepala_bumdes_sees_correct_store_snapshot_totals_without_multi_store_duplication(): void
     {
         $head = User::factory()->create(['role' => 'kepala_bumdes']);
-        $storeA = $this->store('UMKM A');
-        $storeB = $this->store('UMKM B');
+        $storeA = $this->store('Penjual A');
+        $storeB = $this->store('Penjual B');
         $paid = $this->order(PaymentStatus::PAID, OrderFulfillmentStatus::IN_FULFILLMENT, '150000.00');
         $this->storeOrder($paid, $storeA, '100000.00', '10000.00', '90000.00', StoreOrderFulfillmentStatus::COMPLETED);
         $this->storeOrder($paid, $storeB, '50000.00', '5000.00', '45000.00', StoreOrderFulfillmentStatus::PROCESSING);
@@ -32,7 +32,7 @@ class KepalaBumdesStoreReportTest extends TestCase
         $this->actingAs($head)->get(route('kepala-bumdes.stores.index'))
             ->assertOk()
             ->assertSee([
-                'UMKM A', 'UMKM B', '1 / 1', '1 / 0',
+                'Penjual A', 'Penjual B', '1 / 1', '1 / 0',
                 'Rp 100.000,00', 'Rp 10.000,00', 'Rp 90.000,00',
                 'Rp 50.000,00', 'Rp 5.000,00', 'Rp 45.000,00',
             ])
@@ -46,9 +46,9 @@ class KepalaBumdesStoreReportTest extends TestCase
 
     public function test_non_head_roles_are_forbidden_from_store_reports(): void
     {
-        $store = $this->store('UMKM Privat');
+        $store = $this->store('Penjual Privat');
 
-        foreach (['pelanggan', 'pemilik_umkm', 'admin_bumdes', 'kurir'] as $role) {
+        foreach (['pelanggan', 'penjual', 'admin_bumdes', 'kurir'] as $role) {
             $user = User::factory()->create(['role' => $role]);
 
             $this->actingAs($user)->get(route('kepala-bumdes.stores.index'))->assertForbidden();
@@ -59,8 +59,8 @@ class KepalaBumdesStoreReportTest extends TestCase
     public function test_date_store_and_fulfillment_filters_and_pagination_are_read_only(): void
     {
         $head = User::factory()->create(['role' => 'kepala_bumdes']);
-        $selectedStore = $this->store('UMKM Terpilih');
-        $otherStore = $this->store('UMKM Lain');
+        $selectedStore = $this->store('Penjual Terpilih');
+        $otherStore = $this->store('Penjual Lain');
         $matching = $this->order(PaymentStatus::PAID, OrderFulfillmentStatus::IN_FULFILLMENT, '20000.00', '2026-10-22 10:00:00');
         $this->storeOrder($matching, $selectedStore, '20000.00', '2000.00', '18000.00', StoreOrderFulfillmentStatus::PROCESSING);
         $old = $this->order(PaymentStatus::PAID, OrderFulfillmentStatus::COMPLETED, '30000.00', '2026-10-10 10:00:00');
@@ -96,7 +96,7 @@ class KepalaBumdesStoreReportTest extends TestCase
 
     private function store(string $name): UmkmStore
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
 
         return $owner->umkmStore()->create([
             'name' => $name,

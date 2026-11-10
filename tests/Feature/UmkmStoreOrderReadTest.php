@@ -150,7 +150,7 @@ class UmkmStoreOrderReadTest extends TestCase
 
     private function owner(string $storeName): User
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $owner->umkmStore()->create([
             'name' => $storeName,
             'slug' => 'toko-'.Str::lower(Str::random(12)),

@@ -152,7 +152,7 @@ class UmkmEntitlementServiceTest extends TestCase
         $storeOrders = collect();
         $owners = collect();
         for ($index = 0; $index < $count; $index++) {
-            $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+            $owner = User::factory()->create(['role' => 'penjual']);
             $store = $owner->umkmStore()->create(['name' => 'Toko '.Str::random(6), 'slug' => 'toko-'.Str::lower(Str::random(12)), 'status' => 'approved']);
             $isCalculated = $calculated[$index] ?? true;
             $storeOrders->push($order->storeOrders()->create([

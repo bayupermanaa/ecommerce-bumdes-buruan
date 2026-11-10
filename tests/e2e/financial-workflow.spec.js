@@ -37,7 +37,7 @@ test('synthetic pickup checkout, bank proof submission, and admin confirmation',
     expect(hit).toBe(true);
     await addButton.click();
     await page.goto('/checkout');
-    await page.getByLabel('Ambil di Toko UMKM').click();
+    await page.getByLabel('Ambil di Toko Penjual').click();
     await page.getByLabel('Nama penerima').fill('Pelanggan E2E');
     await page.getByLabel('Nomor telepon').fill('0800000001');
     await expect(page.locator('[data-order-button]')).toBeEnabled();

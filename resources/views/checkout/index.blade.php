@@ -51,7 +51,7 @@
                             </label>
                             <label data-fulfillment-card="pickup" class="rounded-lg border border-gray-200 bg-white p-4 transition-colors">
                                 <input type="radio" name="fulfillment_method" value="pickup" data-fulfillment-control class="text-green-700 focus:ring-green-600">
-                                <span class="ml-2 font-semibold text-gray-900">Ambil di Toko UMKM</span>
+                                <span class="ml-2 font-semibold text-gray-900">Ambil di Toko Penjual</span>
                                 <span class="mt-2 block text-sm text-gray-600">Biaya pengiriman Rp 0 untuk pengambilan langsung.</span>
                             </label>
                         </div>
@@ -122,7 +122,8 @@
                                     <h3 class="font-medium text-gray-900">{{ $group['store']->name }}</h3>
                                     <div class="mt-3 space-y-3">
                                         @foreach ($group['items'] as $item)
-                                            @php($available = $item->product->status === 'approved' && $item->product->umkmStore?->status === 'approved' && $item->product->stock >= $item->quantity)
+                                            @php($stockSource = $item->variant ?? $item->product)
+                                            @php($available = $item->product->status === 'approved' && $item->product->umkmStore?->status === 'approved' && ($item->product_variant_id === null ? ! $item->product->variants_exists : ($item->variant?->product_id === $item->product_id && $item->variant?->is_active)) && $stockSource->stock >= $item->quantity)
                                             <div class="flex gap-3 text-sm">
                                                 @if ($item->product->image_path)
                                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($item->product->image_path) }}" alt="{{ $item->product->name }}" class="h-12 w-12 rounded object-cover">
@@ -131,12 +132,13 @@
                                                 @endif
                                                 <div class="min-w-0 flex-1">
                                                     <p class="font-medium text-gray-900">{{ $item->product->name }}</p>
-                                                    <p class="text-gray-600">{{ $item->quantity }} x Rp {{ number_format((float) $item->product->price, 0, ',', '.') }}</p>
+                                                    @if($item->product_variant_id)<p class="text-sm text-emerald-700">Ukuran: {{ $item->variant?->label ?? 'Tidak tersedia' }}</p>@endif
+                                                    <p class="text-gray-600">{{ $item->quantity }} x Rp {{ number_format((float) $stockSource->price, 0, ',', '.') }}</p>
                                                     @if (! $available)
                                                         <p class="mt-1 font-medium text-red-700">Tidak tersedia atau stok tidak cukup.</p>
                                                     @endif
                                                 </div>
-                                                <p class="shrink-0 font-medium text-gray-900">Rp {{ number_format((float) $item->product->price * $item->quantity, 0, ',', '.') }}</p>
+                                                <p class="shrink-0 font-medium text-gray-900">Rp {{ number_format((float) $stockSource->price * $item->quantity, 0, ',', '.') }}</p>
                                             </div>
                                         @endforeach
                                     </div>

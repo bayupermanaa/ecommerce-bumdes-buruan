@@ -15,6 +15,7 @@ class RoleAccessTest extends TestCase
         $cases = [
             'pelanggan' => route('pelanggan.dashboard', absolute: false),
             'pemilik_umkm' => route('umkm.dashboard', absolute: false),
+            'penjual' => route('umkm.dashboard', absolute: false),
             'admin_bumdes' => route('admin.dashboard', absolute: false),
             'kurir' => route('kurir.dashboard', absolute: false),
             'kepala_bumdes' => route('kepala-bumdes.dashboard', absolute: false),
@@ -37,6 +38,7 @@ class RoleAccessTest extends TestCase
             ['role' => 'pelanggan', 'uri' => route('admin.dashboard', absolute: false)],
             ['role' => 'pelanggan', 'uri' => route('umkm.dashboard', absolute: false)],
             ['role' => 'pemilik_umkm', 'uri' => route('admin.dashboard', absolute: false)],
+            ['role' => 'penjual', 'uri' => route('admin.dashboard', absolute: false)],
             ['role' => 'kurir', 'uri' => route('kepala-bumdes.dashboard', absolute: false)],
         ];
 

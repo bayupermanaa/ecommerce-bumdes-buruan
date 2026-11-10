@@ -44,7 +44,7 @@ class CashPaymentReceiptTest extends TestCase
     {
         $payment = $this->cashPayment();
 
-        foreach (['pelanggan', 'pemilik_umkm', 'kurir', 'kepala_bumdes'] as $role) {
+        foreach (['pelanggan', 'penjual', 'kurir', 'kepala_bumdes'] as $role) {
             $this->actingAs(User::factory()->create(['role' => $role]))
                 ->patch(route('admin.payments.cash-receipt', $payment), $this->receiptData())
                 ->assertForbidden();
@@ -233,7 +233,7 @@ class CashPaymentReceiptTest extends TestCase
 
     private function storeOrder(Order $order): StoreOrder
     {
-        $owner = User::factory()->create(['role' => 'pemilik_umkm']);
+        $owner = User::factory()->create(['role' => 'penjual']);
         $store = $owner->umkmStore()->create(['name' => 'Toko Snapshot', 'slug' => fake()->unique()->slug()]);
 
         return StoreOrder::create([

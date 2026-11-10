@@ -22,17 +22,17 @@
                             <option value="cancelled" @selected($selectedStatus === 'cancelled')>Dibatalkan</option>
                         </select>
                     </div>
-                    <button type="submit" class="rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">Filter</button>
+                    <button type="submit" class="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800">Filter</button>
                 </form>
             </div>
 
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="overflow-x-auto p-6">
                     @if ($storeOrders->isEmpty())
-                        <p class="text-sm text-gray-600">Belum ada pesanan untuk toko Anda.</p>
+                        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-600">Belum ada pesanan untuk toko Anda.</div>
                     @else
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="text-left text-gray-600">
+                            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                                 <tr>
                                     <th class="px-3 py-2">Pesanan</th>
                                     <th class="px-3 py-2">Pelanggan</th>
