@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\StoreOrder;
+use App\Notifications\MarketplaceNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -43,6 +44,7 @@ class OrderController extends Controller
         $order->load([
             'storeOrders.items',
             'storeOrders.statusLogs' => fn ($query) => $query->latest('created_at'),
+            'storeOrders.statusLogs.actor',
             'payments' => fn ($query) => $query->latest(),
         ]);
 
@@ -137,6 +139,11 @@ class OrderController extends Controller
                 'cancellation_reason' => $validated['cancellation_reason'] ?? null,
             ])->save();
         });
+
+        $order->load('storeOrders.umkmStore.user');
+        foreach ($order->storeOrders as $storeOrder) {
+            MarketplaceNotification::sendOnce($storeOrder->umkmStore->user, 'Pesanan dibatalkan', 'Pesanan pelanggan yang terkait dengan toko Anda telah dibatalkan.', route('umkm.orders.show', $storeOrder), 'order.cancelled.'.$order->id.'.'.$storeOrder->id);
+        }
 
         return redirect()
             ->route('orders.show', $order)

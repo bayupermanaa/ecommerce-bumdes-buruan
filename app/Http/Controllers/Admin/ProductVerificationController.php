@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Notifications\MarketplaceNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -51,6 +52,8 @@ class ProductVerificationController extends Controller
         $product->verified_at = now();
         $product->rejection_reason = null;
         $product->save();
+        $product->load('umkmStore.user');
+        MarketplaceNotification::sendOnce($product->umkmStore->user, 'Produk disetujui', 'Produk Anda telah disetujui dan dapat tampil di katalog.', route('umkm.products.index'), 'product.approved.'.$product->id);
 
         return $this->redirectToIndex($request)
             ->with('status', 'Produk berhasil disetujui.');
@@ -76,6 +79,8 @@ class ProductVerificationController extends Controller
         $product->rejection_reason = $validated['rejection_reason'];
         $product->verified_at = now();
         $product->save();
+        $product->load('umkmStore.user');
+        MarketplaceNotification::sendOnce($product->umkmStore->user, 'Produk ditolak', 'Produk Anda ditolak: '.$product->rejection_reason, route('umkm.products.index'), 'product.rejected.'.$product->id.'.'.$product->updated_at->timestamp);
 
         return $this->redirectToIndex($request)
             ->with('status', 'Produk ditolak.');

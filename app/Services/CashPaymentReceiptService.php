@@ -29,7 +29,7 @@ class CashPaymentReceiptService
             ]);
         }
 
-        $receivedAtDate = Carbon::parse($receivedAt);
+        $receivedAtDate = Carbon::parse($receivedAt, 'UTC');
 
         if ($receivedAtDate->isFuture()) {
             throw ValidationException::withMessages([

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\UmkmStore;
 use App\Models\User;
 use App\Support\UserRoles;
+use App\Notifications\MarketplaceNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -101,6 +102,8 @@ class UmkmStoreVerificationController extends Controller
             return $this->redirectToIndex($request)
                 ->with('error', 'Toko ini sudah diproses dan tidak dapat disetujui kembali.');
         }
+        $store->load('user');
+        MarketplaceNotification::sendOnce($store->user, 'Toko disetujui', 'Toko Anda telah disetujui Admin BUMDes.', route('umkm.dashboard'), 'store.approved.'.$store->id);
 
         return $this->redirectToIndex($request)
             ->with('status', 'Toko berhasil disetujui.');
@@ -139,6 +142,8 @@ class UmkmStoreVerificationController extends Controller
             return $this->redirectToIndex($request)
                 ->with('error', 'Toko ini sudah diproses dan tidak dapat ditolak kembali.');
         }
+        $store->load('user');
+        MarketplaceNotification::sendOnce($store->user, 'Toko ditolak', 'Pengajuan toko Anda ditolak. Periksa alasan dan ajukan perbaikan.', route('seller-application.show'), 'store.rejected.'.$store->id.'.'.$store->updated_at->timestamp);
 
         return $this->redirectToIndex($request)
             ->with('status', 'Toko ditolak.');

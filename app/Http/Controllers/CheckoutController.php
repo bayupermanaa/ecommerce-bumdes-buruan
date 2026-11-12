@@ -10,6 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\StoreOrder;
 use App\Models\UmkmStore;
 use App\Services\CommissionCalculationService;
+use App\Notifications\MarketplaceNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -283,6 +284,10 @@ class CheckoutController extends Controller
         });
 
         $request->session()->forget('checkout_token');
+        $order->load('storeOrders.umkmStore');
+        foreach ($order->storeOrders as $storeOrder) {
+            MarketplaceNotification::sendOnce($storeOrder->umkmStore->user, 'Pesanan baru', 'Anda menerima pesanan baru dari pelanggan.', route('umkm.orders.show', $storeOrder), 'order.created.'.$order->id.'.'.$storeOrder->id);
+        }
 
         return redirect()
             ->route('orders.show', $order)

@@ -85,6 +85,7 @@
                         </a>
                     </div>
                 </nav>
+                <a href="{{ route('help.index') }}" class="mx-4 mb-3 block rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/10 hover:text-white">Bantuan</a>
 
                 <div class="shrink-0 border-t border-white/10 p-4">
                     <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
@@ -102,6 +103,7 @@
                 <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
                     <div class="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div class="flex items-center gap-3">
+                            <x-notification-bell />
                             <button type="button" class="rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-50 lg:hidden" @click="adminSidebarOpen = true" aria-label="Buka menu">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                             </button>

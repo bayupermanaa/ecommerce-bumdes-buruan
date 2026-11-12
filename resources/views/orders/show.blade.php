@@ -12,6 +12,9 @@
 
         <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
             <div class="space-y-6">
+                @foreach ($order->storeOrders as $storeOrder)
+                    <x-order-timeline :order="$order" :store-order="$storeOrder" />
+                @endforeach
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                     <p class="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Pesanan Berhasil Dibuat</p>
                     <h1 class="mt-2 text-2xl font-bold text-gray-900">{{ $order->order_number }}</h1>
@@ -47,6 +50,9 @@
                                     <div>
                                         <p class="font-medium text-gray-900">{{ $item->product_name_snapshot }}</p>
                                         <p class="mt-1 text-gray-600">{{ $item->sku_snapshot }} | {{ $item->quantity }} x Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}</p>
+                                        @if ($item->custom_specifications)
+                                            <p class="mt-1 text-xs text-emerald-700">Pesanan custom: {{ data_get($item->custom_specifications, 'notes') }}</p>
+                                        @endif
                                     </div>
                                     <p class="shrink-0 font-medium text-gray-900">Rp {{ number_format((float) $item->line_total, 0, ',', '.') }}</p>
                                 </div>

@@ -39,3 +39,32 @@
     outline: 2px solid rgb(5 150 105);
     outline-offset: 2px;
 }
+
+/* Keep long chat text, prices and form controls inside narrow phone viewports. */
+@media (max-width: 430px) {
+    .marketplace-chat #chat-messages,
+    .marketplace-chat article,
+    .custom-checkout,
+    .order-timeline {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .marketplace-chat input,
+    .marketplace-chat select,
+    .marketplace-chat textarea,
+    .custom-checkout input {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .marketplace-chat button,
+    .marketplace-chat article a,
+    .custom-checkout button {
+        min-height: 44px;
+    }
+
+    .marketplace-chat input[type="file"] {
+        width: 100%;
+    }
+}

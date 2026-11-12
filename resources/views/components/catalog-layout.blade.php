@@ -22,10 +22,12 @@
 
                 <nav class="hidden items-center gap-2 text-sm font-semibold md:flex lg:gap-4" aria-label="Navigasi marketplace desktop">
                     <a href="{{ route('catalog.index') }}" class="inline text-slate-600 hover:text-emerald-700">Katalog</a>
+                    <a href="{{ route('help.index') }}" class="rounded-xl px-2.5 py-2 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Bantuan</a>
                     @auth
                         @if (\App\Support\UserRoles::canBuy(auth()->user()->role))
                             <a href="{{ route('cart.index') }}" class="rounded-xl px-2.5 py-2 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Keranjang</a>
                             <a href="{{ route('orders.index') }}" class="rounded-xl px-2.5 py-2 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Pesanan</a>
+                            <a href="{{ route('chat.index') }}" class="rounded-xl px-2.5 py-2 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">Chat</a><x-notification-bell />
                         @endif
                         @if (auth()->user()->role === 'pelanggan')
                             <a href="{{ route('seller-application.show') }}" class="rounded-xl px-2.5 py-2 text-emerald-700 hover:bg-emerald-50">Mulai Berjualan</a>
@@ -48,13 +50,15 @@
                 </button>
             </div>
 
-            <nav id="marketplace-mobile-menu" x-cloak x-show="marketplaceMenuOpen" @click.outside="marketplaceMenuOpen = false" class="border-t border-slate-200 bg-white px-4 py-4 md:hidden" aria-label="Navigasi marketplace mobile">
+            <nav id="marketplace-mobile-menu" x-cloak x-show="marketplaceMenuOpen" @click.outside="marketplaceMenuOpen = false" class="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-slate-200 bg-white px-4 py-4 md:hidden" aria-label="Navigasi marketplace mobile">
                 <div class="mx-auto grid max-w-7xl gap-2 text-sm font-semibold">
                     <a href="{{ route('catalog.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Katalog</a>
+                    <a href="{{ route('help.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Bantuan</a>
                     @auth
                         @if (\App\Support\UserRoles::canBuy(auth()->user()->role))
                             <a href="{{ route('cart.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Keranjang</a>
                             <a href="{{ route('orders.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Pesanan</a>
+                            <a href="{{ route('chat.index') }}" class="rounded-xl px-3 py-2.5 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Chat</a>
                         @endif
                         @if (auth()->user()->role === 'pelanggan')
                             <a href="{{ route('seller-application.show') }}" class="rounded-xl px-3 py-2.5 text-emerald-700 hover:bg-emerald-50">Mulai Berjualan</a>

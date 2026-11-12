@@ -55,6 +55,31 @@ class CustomerOrderTrackingTest extends TestCase
         $this->actingAs($other)->get(route('orders.show', $order))->assertForbidden();
     }
 
+    public function test_timeline_keeps_unverified_payment_pending_and_shows_each_store_separately(): void
+    {
+        $customer = User::factory()->create(['role' => 'pelanggan']);
+        $order = $this->order($customer, PaymentStatus::PENDING_CONFIRMATION, OrderFulfillmentStatus::PENDING_PAYMENT);
+        $first = $this->storeOrder($order, 'Toko Pertama', StoreOrderFulfillmentStatus::PENDING_PAYMENT);
+        $second = $this->storeOrder($order, 'Toko Kedua', StoreOrderFulfillmentStatus::PENDING_PAYMENT);
+
+        $this->actingAs($customer)->get(route('orders.show', $order))
+            ->assertOk()->assertSee('Perjalanan pesanan')
+            ->assertSee($first->store_order_number)->assertSee($second->store_order_number)
+            ->assertSee('masih menunggu verifikasi Admin BUMDes')
+            ->assertDontSee('Pembayaran dikonfirmasi</p>', false);
+    }
+
+    public function test_cancelled_order_timeline_uses_actual_cancellation_time(): void
+    {
+        $customer = User::factory()->create(['role' => 'pelanggan']);
+        $order = $this->order($customer, PaymentStatus::UNPAID, OrderFulfillmentStatus::CANCELLED);
+        $order->forceFill(['cancelled_at' => now()])->save();
+        $this->storeOrder($order, 'Toko Batal', StoreOrderFulfillmentStatus::CANCELLED);
+
+        $this->actingAs($customer)->get(route('orders.show', $order))
+            ->assertOk()->assertSee('Pesanan dibatalkan')->assertSee($order->cancelled_at->format('d-m-Y H:i'));
+    }
+
     public function test_order_is_only_presented_as_completed_after_all_stores_complete(): void
     {
         $customer = User::factory()->create(['role' => 'pelanggan']);

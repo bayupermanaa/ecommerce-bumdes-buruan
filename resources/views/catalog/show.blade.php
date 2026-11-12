@@ -14,6 +14,11 @@
                 <p class="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">{{ $product->category->name }}</p>
                 <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">{{ $product->name }}</h1>
                 <p class="mt-3 text-sm text-gray-600">Dijual oleh {{ $product->umkmStore->name }}</p>
+                @auth
+                    @if (\App\Support\UserRoles::canBuy(auth()->user()->role) && $product->umkmStore->user_id !== auth()->id())
+                        <form method="POST" action="{{ route('chat.start', $product) }}" class="mt-4">@csrf<button class="inline-flex rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100">Chat Penjual</button></form>
+                    @endif
+                @endauth
                 @php($activeVariants = $product->activeVariants->values())
                 @php($min = $activeVariants->min('price') ?: $product->price)
                 @php($max = $activeVariants->max('price') ?: $product->price)

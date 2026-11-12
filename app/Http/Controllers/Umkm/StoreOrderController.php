@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Umkm;
 use App\Http\Controllers\Controller;
 use App\Models\StoreOrder;
 use App\Services\StoreOrderFulfillmentService;
+use App\Notifications\MarketplaceNotification;
 use App\Support\StoreOrderFulfillmentStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -82,6 +83,8 @@ class StoreOrderController extends Controller
         Gate::authorize('update', $storeOrder);
         $fulfillment->transition($storeOrder, $request->user(), $targetStatus);
 
+        $storeOrder->load('order.user');
+        MarketplaceNotification::sendOnce($storeOrder->order->user, 'Status pesanan berubah', $message, route('orders.show', $storeOrder->order), 'fulfillment.'.$storeOrder->id.'.'.$targetStatus);
         return redirect()->route('umkm.orders.show', $storeOrder)->with('status', $message);
     }
 }

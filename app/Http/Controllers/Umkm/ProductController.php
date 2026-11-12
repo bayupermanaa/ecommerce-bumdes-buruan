@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductRevision;
+use App\Models\User;
+use App\Notifications\MarketplaceNotification;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -58,9 +60,11 @@ class ProductController extends Controller
 
         $imagePath = $image?->store('products', 'public');
 
+        $createdProductId = null;
         try {
-            DB::transaction(function () use ($request, $data, $imagePath): void {
+            DB::transaction(function () use ($request, $data, $imagePath, &$createdProductId): void {
                 $product = $request->user()->umkmStore->products()->create([...$data, 'image_path' => $imagePath]);
+                $createdProductId = $product->id;
                 $this->syncVariants($product, $request);
             });
         } catch (Throwable $exception) {
@@ -70,6 +74,7 @@ class ProductController extends Controller
 
             throw $exception;
         }
+        User::query()->where('role', 'admin_bumdes')->get()->each(fn (User $admin) => MarketplaceNotification::sendOnce($admin, 'Produk baru menunggu verifikasi', 'Ada produk baru yang menunggu verifikasi.', route('admin.products.index', ['status'=>'pending']), 'product.submitted.'.$createdProductId));
 
         return redirect()
             ->route('umkm.products.index')
@@ -109,6 +114,7 @@ class ProductController extends Controller
         if ($product->status === 'approved') {
             return $this->submitApprovedProductRevision($product, $data, $image);
         }
+
 
         $newImagePath = $image?->store('products', 'public');
         $oldImagePath = $product->image_path;
@@ -170,15 +176,17 @@ class ProductController extends Controller
 
         $imagePath = $image?->store('product-revisions', 'public');
 
+        $revisionId = null;
         try {
-            DB::transaction(function () use ($product, $content, $data, $imagePath): void {
-                ProductRevision::create([
+            DB::transaction(function () use ($product, $content, $data, $imagePath, &$revisionId): void {
+                $revision = ProductRevision::create([
                     'product_id' => $product->id,
                     ...$content,
                     'image_path' => $imagePath,
                     'status' => 'pending',
                     'pending_key' => 'pending',
                 ]);
+                $revisionId = $revision->id;
 
                 $product->update(['stock' => $data['stock']]);
             });
@@ -197,6 +205,8 @@ class ProductController extends Controller
 
             throw $exception;
         }
+
+        User::query()->where('role', 'admin_bumdes')->get()->each(fn (User $admin) => MarketplaceNotification::sendOnce($admin, 'Revisi produk menunggu verifikasi', 'Ada revisi produk yang menunggu persetujuan.', route('admin.product-revisions.index', ['status'=>'pending']), 'product.revision.submitted.'.$revisionId));
 
         return redirect()
             ->route('umkm.products.index')

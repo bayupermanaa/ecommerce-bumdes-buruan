@@ -23,6 +23,7 @@ class OrderItem extends Model
         'sku_snapshot',
         'variant_label_snapshot',
         'variant_sku_snapshot',
+        'custom_specifications',
         'unit_price',
         'quantity',
         'line_total',
@@ -39,6 +40,7 @@ class OrderItem extends Model
             'unit_price' => 'decimal:2',
             'quantity' => 'integer',
             'line_total' => 'decimal:2',
+            'custom_specifications' => 'array',
         ];
     }
 

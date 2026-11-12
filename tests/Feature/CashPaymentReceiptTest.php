@@ -61,13 +61,40 @@ class CashPaymentReceiptTest extends TestCase
             ->assertSessionHasErrors(['cash_received_by_name', 'cash_received_at', 'cash_received_confirmation']);
 
         $this->actingAs($admin)
-            ->patch(route('admin.payments.cash-receipt', $cashPayment), $this->receiptData(['cash_received_at' => now()->addMinute()->format('Y-m-d\TH:i')]))
+            ->patch(route('admin.payments.cash-receipt', $cashPayment), $this->receiptData(['cash_received_at' => now('Asia/Makassar')->addMinutes(2)->format('Y-m-d\TH:i')]))
             ->assertSessionHasErrors('cash_received_at');
 
         $transfer = $this->transferPayment();
         $this->actingAs($admin)
             ->patch(route('admin.payments.cash-receipt', $transfer), $this->receiptData())
             ->assertForbidden();
+    }
+
+    public function test_wita_cash_receipt_is_compared_as_utc_and_stored_without_changing_payment_status(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2026-11-12 00:30:00', 'UTC'));
+        $admin = $this->admin();
+        $payment = $this->cashPayment();
+
+        $this->actingAs($admin)->patch(route('admin.payments.cash-receipt', $payment), $this->receiptData([
+            'cash_received_at' => '2026-11-12T08:15',
+        ]))->assertRedirect(route('admin.payments.show', $payment));
+
+        $this->assertSame('2026-11-12 00:15:00', $payment->fresh()->cash_received_at->format('Y-m-d H:i:s'));
+        $this->assertSame(PaymentStatus::PENDING_CONFIRMATION, $payment->fresh()->status);
+    }
+
+    public function test_future_wita_cash_receipt_is_rejected_without_financial_write(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2026-11-12 00:30:00', 'UTC'));
+        $payment = $this->cashPayment();
+
+        $this->actingAs($this->admin())->patch(route('admin.payments.cash-receipt', $payment), $this->receiptData([
+            'cash_received_at' => '2026-11-12T08:31',
+        ]))->assertSessionHasErrors('cash_received_at');
+
+        $this->assertNull($payment->fresh()->cash_received_at);
+        $this->assertSame(PaymentStatus::PENDING_CONFIRMATION, $payment->fresh()->status);
     }
 
     public function test_cancelled_paid_and_duplicate_cash_receipts_are_rejected(): void
@@ -208,7 +235,7 @@ class CashPaymentReceiptTest extends TestCase
     {
         return array_merge([
             'cash_received_by_name' => 'Petugas Loket BUMDes',
-            'cash_received_at' => now()->subMinute()->format('Y-m-d\TH:i'),
+            'cash_received_at' => now('Asia/Makassar')->subMinute()->format('Y-m-d\TH:i'),
             'cash_received_confirmation' => '1',
         ], $overrides);
     }

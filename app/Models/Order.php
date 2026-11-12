@@ -20,6 +20,7 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'checkout_token',
+        'chat_offer_id',
         'user_id',
         'fulfillment_method',
         'recipient_name',
@@ -127,6 +128,11 @@ class Order extends Model
     public function confirmedPayment(): HasOne
     {
         return $this->hasOne(Payment::class, 'confirmed_order_id');
+    }
+
+    public function chatOffer(): BelongsTo
+    {
+        return $this->belongsTo(ChatOffer::class, 'chat_offer_id');
     }
 
     /**

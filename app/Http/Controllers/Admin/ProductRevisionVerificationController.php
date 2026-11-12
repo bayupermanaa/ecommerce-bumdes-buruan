@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductRevision;
+use App\Notifications\MarketplaceNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -84,6 +85,8 @@ class ProductRevisionVerificationController extends Controller
         if ($revision->image_path !== null && $oldImagePath !== null && $oldImagePath !== $revision->image_path) {
             $this->deleteImageWhenUnreferenced($oldImagePath);
         }
+        $revision->load('product.umkmStore.user');
+        MarketplaceNotification::sendOnce($revision->product->umkmStore->user, 'Revisi produk disetujui', 'Revisi produk Anda telah disetujui dan dipublikasikan.', route('umkm.products.index'), 'revision.approved.'.$revision->id);
 
         return $this->redirectToIndex($request)
             ->with('status', 'Revisi produk berhasil disetujui dan dipublikasikan.');
@@ -121,6 +124,8 @@ class ProductRevisionVerificationController extends Controller
             return $this->redirectToIndex($request)
                 ->with('error', 'Revisi ini sudah diproses dan tidak dapat ditolak kembali.');
         }
+        $revision->load('product.umkmStore.user');
+        MarketplaceNotification::sendOnce($revision->product->umkmStore->user, 'Revisi produk ditolak', 'Revisi produk Anda ditolak: '.$revision->rejection_reason, route('umkm.products.index'), 'revision.rejected.'.$revision->id);
 
         return $this->redirectToIndex($request)
             ->with('status', 'Revisi produk ditolak. Produk yang tampil di katalog tidak berubah.');

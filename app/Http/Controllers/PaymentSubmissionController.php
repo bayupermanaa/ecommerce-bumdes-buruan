@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BumdesBankAccount;
 use App\Models\Order;
+use App\Models\User;
+use App\Notifications\MarketplaceNotification;
 use App\Services\PaymentSubmissionService;
 use App\Support\PaymentMethod;
 use Illuminate\Http\RedirectResponse;
@@ -64,6 +66,7 @@ class PaymentSubmissionController extends Controller
                 $validated,
                 $request->file('transfer_proof'),
             );
+            User::query()->where('role', 'admin_bumdes')->get()->each(fn (User $admin) => MarketplaceNotification::sendOnce($admin, 'Pembayaran baru menunggu verifikasi', 'Ada pengajuan pembayaran baru dari pelanggan.', route('admin.payments.index', ['status'=>'pending_confirmation']), 'payment.submitted.'.$order->id.'.'.$validated['idempotency_key']));
 
             return redirect()
                 ->route('orders.show', $order)
@@ -72,6 +75,7 @@ class PaymentSubmissionController extends Controller
 
         $validated = $request->validate($baseRules);
         $paymentSubmission->submitCashPickup($order, $request->user(), $validated['idempotency_key']);
+        User::query()->where('role', 'admin_bumdes')->get()->each(fn (User $admin) => MarketplaceNotification::sendOnce($admin, 'Pembayaran baru menunggu verifikasi', 'Ada pengajuan pembayaran baru dari pelanggan.', route('admin.payments.index', ['status'=>'pending_confirmation']), 'payment.submitted.'.$order->id.'.'.$validated['idempotency_key']));
 
         return redirect()
             ->route('orders.show', $order)

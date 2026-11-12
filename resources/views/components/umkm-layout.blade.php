@@ -42,6 +42,7 @@
                                 ['umkm.stores.*', 'umkm.stores.index', 'Profil Toko', 'store'],
                                 ['umkm.products.*', 'umkm.products.index', 'Produk Saya', 'package-check'],
                                 ['umkm.orders.*', 'umkm.orders.index', 'Pesanan Masuk', 'credit-card'],
+                                ['chat.*', 'chat.index', 'Chat Pembeli', 'message-circle'],
                             ] as [$activeRoute, $routeName, $label, $icon])
                                 <a href="{{ route($routeName) }}" @if(request()->routeIs($activeRoute)) aria-current="page" @endif class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition {{ request()->routeIs($activeRoute) ? 'bg-white text-slate-950 shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}"><x-admin-icon :name="$icon" /><span>{{ $label }}</span></a>
                             @endforeach
@@ -61,6 +62,8 @@
                         </div>
                     </div>
                 </nav>
+                <a href="{{ route('help.index') }}" class="mx-4 mb-3 block rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/10 hover:text-white">Bantuan</a>
+                <div class="px-4 pb-4"><x-notification-bell /></div>
 
                 <div class="shrink-0 border-t border-white/10 p-4">
                     <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">

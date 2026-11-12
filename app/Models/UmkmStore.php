@@ -86,4 +86,6 @@ class UmkmStore extends Model
     {
         return $this->hasMany(UmkmDisbursement::class);
     }
+
+    public function chatConversations(): HasMany { return $this->hasMany(ChatConversation::class); }
 }

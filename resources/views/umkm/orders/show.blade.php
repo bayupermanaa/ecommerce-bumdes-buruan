@@ -8,6 +8,7 @@
             <a href="{{ route('umkm.orders.index') }}" class="text-sm font-semibold text-gray-700 hover:text-gray-950">&larr; Pesanan Masuk</a>
         </div>
     <div class="mx-auto max-w-5xl space-y-6">
+            <x-order-timeline :order="$storeOrder->order" :store-order="$storeOrder" />
             @if (session('status'))
                 <div class="rounded-md bg-green-50 p-4 text-sm text-green-800">{{ session('status') }}</div>
             @endif
@@ -66,7 +67,7 @@
                         <thead class="text-left text-gray-600"><tr><th class="px-3 py-2">Produk</th><th class="px-3 py-2">SKU</th><th class="px-3 py-2">Harga</th><th class="px-3 py-2">Jumlah</th><th class="px-3 py-2 text-right">Subtotal</th></tr></thead>
                         <tbody class="divide-y divide-gray-200 text-gray-900">
                             @foreach ($storeOrder->items as $item)
-                                <tr><td class="px-3 py-3">{{ $item->product_name_snapshot }}</td><td class="px-3 py-3">{{ $item->sku_snapshot }}</td><td class="px-3 py-3">Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}</td><td class="px-3 py-3">{{ $item->quantity }}</td><td class="px-3 py-3 text-right">Rp {{ number_format((float) $item->line_total, 0, ',', '.') }}</td></tr>
+                                <tr><td class="px-3 py-3">{{ $item->product_name_snapshot }}@if($item->custom_specifications)<p class="mt-1 text-xs text-emerald-700">Custom: {{ data_get($item->custom_specifications, 'notes') }}</p>@endif</td><td class="px-3 py-3">{{ $item->sku_snapshot }}</td><td class="px-3 py-3">Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}</td><td class="px-3 py-3">{{ $item->quantity }}</td><td class="px-3 py-3 text-right">Rp {{ number_format((float) $item->line_total, 0, ',', '.') }}</td></tr>
                             @endforeach
                         </tbody>
                     </table>

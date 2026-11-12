@@ -26,6 +26,9 @@ use App\Http\Controllers\Umkm\RecipientBankAccountController;
 use App\Http\Controllers\Umkm\DisbursementRequestController;
 use App\Http\Controllers\UmkmStoreController;
 use App\Http\Controllers\SellerApplicationController;
+use App\Http\Controllers\ChatController;
+  use App\Http\Controllers\CustomCheckoutController;
+  use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\KepalaBumdesMonitoringController;
 use App\Http\Controllers\KepalaBumdesDisbursementApprovalController;
 use App\Http\Controllers\KepalaBumdes\CommissionReportController;
@@ -38,6 +41,7 @@ Route::get('/', function () {
 });
 
 Route::get('/katalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::view('/bantuan', 'help.index')->name('help.index');
 Route::get('/katalog/{slug}', [CatalogController::class, 'show'])->name('catalog.show');
 
 Route::get('/dashboard', function () {
@@ -59,7 +63,26 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
         ->name('seller-application.resubmit');
 });
 
+Route::middleware('auth')->group(function () {
+    Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifikasi/poll', [NotificationController::class, 'poll'])->name('notifications.poll');
+    Route::post('/notifikasi/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::post('/notifikasi/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+});
+
 Route::middleware(['auth', 'role:pelanggan,penjual'])->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{conversation}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{conversation}/messages', [ChatController::class, 'send'])->name('chat.messages.store');
+    Route::post('/chat/{conversation}/offers', [ChatController::class, 'createOffer'])->name('chat.offers.store')->middleware('role:penjual');
+    Route::post('/chat/offers/{offer}/accept', [ChatController::class, 'acceptOffer'])->name('chat.offers.accept');
+    Route::post('/chat/offers/{offer}/reject', [ChatController::class, 'rejectOffer'])->name('chat.offers.reject');
+    Route::get('/checkout/custom/{offer}', [CustomCheckoutController::class, 'show'])->name('checkout.custom.show');
+    Route::post('/checkout/custom/{offer}', [CustomCheckoutController::class, 'store'])->name('checkout.custom.store');
+    Route::get('/chat/{conversation}/poll', [ChatController::class, 'poll'])->name('chat.poll');
+    Route::get('/chat/messages/{message}/image', [ChatController::class, 'image'])->name('chat.messages.image');
+    Route::post('/chat/produk/{product}', [ChatController::class, 'start'])->name('chat.start');
+
     Route::get('/mulai-berjualan', [SellerApplicationController::class, 'show'])
         ->name('seller-application.show');
 

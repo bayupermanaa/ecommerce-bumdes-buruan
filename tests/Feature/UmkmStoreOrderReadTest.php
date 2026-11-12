@@ -60,6 +60,7 @@ class UmkmStoreOrderReadTest extends TestCase
             ->get(route('umkm.orders.show', $storeOrder))
             ->assertOk()
             ->assertSee([
+                'Perjalanan pesanan',
                 $storeOrder->store_order_number,
                 'Produk PESANAN-SNAPSHOT',
                 'SKU-PESANAN-SNAPSHOT',

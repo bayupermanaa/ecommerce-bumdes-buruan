@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\UmkmStore;
 use App\Models\User;
+use App\Notifications\MarketplaceNotification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
@@ -66,6 +67,7 @@ class SellerApplicationController extends Controller
 
             throw $exception;
         }
+        User::query()->where('role', 'admin_bumdes')->get()->each(fn (User $admin) => MarketplaceNotification::sendOnce($admin, 'Pengajuan toko baru', 'Ada pengajuan pembukaan toko yang menunggu verifikasi.', route('admin.umkm-stores.index', ['status'=>'pending']), 'store.application.'.$request->user()->id.'.'.$request->user()->umkmStore()->value('id')));
 
         return redirect()
             ->route('seller-application.show')
@@ -114,6 +116,7 @@ class SellerApplicationController extends Controller
         if ($newLogoPath !== null && is_string($oldLogoPath) && $oldLogoPath !== $newLogoPath) {
             Storage::disk('public')->delete($oldLogoPath);
         }
+        User::query()->where('role', 'admin_bumdes')->get()->each(fn (User $admin) => MarketplaceNotification::sendOnce($admin, 'Pengajuan toko diperbarui', 'Pengajuan toko telah diajukan ulang dan menunggu verifikasi.', route('admin.umkm-stores.index', ['status'=>'pending']), 'store.resubmit.'.$store->id.'.'.$store->updated_at->timestamp));
 
         return redirect()
             ->route('seller-application.show')

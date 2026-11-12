@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\RecordCashPaymentReceiptRequest;
 use App\Models\Payment;
 use App\Services\CashPaymentReceiptService;
 use App\Services\PaymentConfirmationService;
+use App\Notifications\MarketplaceNotification;
 use App\Support\PaymentMethod;
 use App\Support\PaymentStatus;
 use Illuminate\Http\RedirectResponse;
@@ -101,6 +102,8 @@ class PaymentVerificationController extends Controller
         Gate::authorize('confirm', $payment);
 
         $paymentConfirmation->confirm($payment, request()->user());
+        $payment->load('order.user');
+        MarketplaceNotification::sendOnce($payment->order->user, 'Pembayaran diverifikasi', 'Pembayaran pesanan Anda telah diverifikasi Admin BUMDes.', route('orders.show', $payment->order), 'payment.confirmed.'.$payment->id);
 
         return redirect()
             ->route('admin.payments.show', $payment)
@@ -114,6 +117,8 @@ class PaymentVerificationController extends Controller
         Gate::authorize('reject', $payment);
 
         $paymentConfirmation->reject($payment, $request->user(), $request->validated('rejection_reason'));
+        $payment->load('order.user');
+        MarketplaceNotification::sendOnce($payment->order->user, 'Pembayaran ditolak', 'Pengajuan pembayaran pesanan Anda ditolak dan dapat diajukan kembali.', route('orders.show', $payment->order), 'payment.rejected.'.$payment->id);
 
         return redirect()
             ->route('admin.payments.show', $payment)
@@ -128,7 +133,7 @@ class PaymentVerificationController extends Controller
             $payment,
             $request->user(),
             $request->validated('cash_received_by_name'),
-            $request->validated('cash_received_at'),
+            $request->receivedAtUtc(),
         );
 
         return redirect()

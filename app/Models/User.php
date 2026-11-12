@@ -141,4 +141,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(UmkmDisbursement::class, 'approved_by');
     }
+
+    public function chatConversationsAsCustomer(): HasMany { return $this->hasMany(ChatConversation::class, 'customer_id'); }
+    public function chatMessages(): HasMany { return $this->hasMany(ChatMessage::class, 'sender_id'); }
 }
